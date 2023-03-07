@@ -1,0 +1,20 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+    //toolbar
+    <dimen name="toolbar_height">60dp</dimen>
+
+    //elevation
+    <dimen name="cardElevation">0dp</dimen>
+    <dimen name="actionElevation">5dp</dimen>
+
+    //radius
+    <dimen name="cardCornerRadius">15dp</dimen>
+    <dimen name="cardCornerRadius_Main">15dp</dimen>
+
+    //margin
+    <dimen name="layout_marginVertical">7dp</dimen>
+
+
+
+</resources>

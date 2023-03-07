@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#8BC34A</color>
+    <color name="blue">#00BCD4</color>
+
+
+    <color name="colorPrimary">#9BA2AC</color>
+    <color name="colorSecondary">#EBEBEB</color>
+
+    <color name="colorAccent">#F44336</color>
+    <color name="textColor">@color/black</color>
+    <color name="fadeTextColor">#202020</color>
+    <color name="colorControlNormal">@color/black</color>
+
+</resources>
