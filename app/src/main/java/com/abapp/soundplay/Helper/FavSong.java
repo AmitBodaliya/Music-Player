@@ -22,45 +22,29 @@ public class FavSong {
     }
 
 
-    public void addToFavourite(File file) {
-        if (!checkSongIsPresentInFav(file) && !file.isDirectory()) {
-            Songs songs = new Songs();
-            songs.setSong(file.toString());
-
-            myDBHandler.addFavSong(songs);
+    public void addToFavourite(SongsInfo songsInfo) {
+        if (!checkSongIsPresentInFav(songsInfo) && !songsInfo.getPath().isDirectory()) {
+            myDBHandler.addFavSong(songsInfo);
         }
     }
 
 
     public void removeFavouriteSong(File file) {
-        myDBHandler.deleteFavSongById(myDBHandler.getPresentSOngId(file.toString()));
+        myDBHandler.deleteFavSongById(file);
     }
 
-    public boolean checkSongIsPresentInFav(File file) {
-        return myDBHandler.checkFavIS(file.toString());
+    public boolean checkSongIsPresentInFav(SongsInfo songsInfo) {
+        return myDBHandler.songIsFav(songsInfo.getPath());
+    }
+
+    public boolean isListEmpty(){
+        ArrayList<SongsInfo> songsInfos = myDBHandler.getAllFavSongs();
+        return songsInfos.isEmpty();
     }
 
 
     public ArrayList<SongsInfo> getAllFavouriteSOng() {
-        ArrayList<SongsInfo> list = new ArrayList<>();
-
-        ArrayList<Songs> songsArrayList = myDBHandler.getFavAllSongs();
-
-        if (songsArrayList.size() == 0) {
-            Toast.makeText(context , "No Favourite Songs", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-
-        for (Songs song : songsArrayList) {
-            list.add(new SongsInfo(new File(song.getSong()).getName(), new File(song.getSong())));
-        }
-
-        Collections.sort(list, SongsInfo.sortByTitle);
-
-        return list;
+        return myDBHandler.getAllFavSongs();
     }
-
-
-
 
 }

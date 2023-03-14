@@ -17,6 +17,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.abapp.soundplay.Adapter.ViewPagerAdapter;
+import com.abapp.soundplay.Helper.FavSong;
 import com.abapp.soundplay.Helper.FetchFileData;
 import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
@@ -26,6 +27,7 @@ import com.abapp.soundplay.Music.MusicPlayer_2;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
 import com.abapp.soundplay.ViewHalper.SearchView;
+import com.abapp.soundplay.ViewHalper.ShowListView;
 import com.abapp.soundplay.ViewHalper.SongInfoView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
 
     UniqueIdGen uniqueIdGen;
+    FavSong favSong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
 
         uniqueIdGen = UniqueIdGen.getInstance();
+        favSong = new FavSong(this);
         mediaMetaData = new MediaMetaData(this);
         fetchFileData = new FetchFileData(this);
 
@@ -321,11 +325,14 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
     }
 
     public void showSongListDialog(String title, ArrayList<SongsInfo> list) {
-        Toast.makeText(this, "list " + list.size(), Toast.LENGTH_SHORT).show();
+        if (title.equals("")) title = "<unknown>";
+        new ShowListView(this , this, "" + title , list);
     }
 
     public void showAllFavSOng() {
-
+        if (favSong.isListEmpty())
+            Toast.makeText(this, "No Favourite Song", Toast.LENGTH_SHORT).show();
+        else new ShowListView(this , this, "Favourite Songs" , favSong.getAllFavouriteSOng());
     }
 
 

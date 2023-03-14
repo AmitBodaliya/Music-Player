@@ -45,7 +45,7 @@ public class ShowListView {
         window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
 
 
-        final AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.FullScreenAlertDialogStyle);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.FullScreenAlertDialogStyle2);
         View mView = activity.getLayoutInflater().inflate(R.layout.dialog_list_view, null);
 
         mView.setMinimumWidth((int) (displayRectangle.width() * 1f));

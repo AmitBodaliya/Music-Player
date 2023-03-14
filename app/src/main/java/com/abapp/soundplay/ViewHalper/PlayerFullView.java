@@ -246,12 +246,12 @@ public class PlayerFullView {
 
         //favourite song icon on click
         imageViewF.setOnClickListener(v -> {
-            if (favSong.checkSongIsPresentInFav(currentSongInfo.getPath())) {
+            if (favSong.checkSongIsPresentInFav(currentSongInfo)) {
                 imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
                 Toast.makeText(context, "Remove from Favourite", Toast.LENGTH_SHORT).show();
                 favSong.removeFavouriteSong(currentSongInfo.getPath());
             } else {
-                favSong.addToFavourite(currentSongInfo.getPath());
+                favSong.addToFavourite(currentSongInfo);
                 Toast.makeText(context, "Added to Favourite", Toast.LENGTH_SHORT).show();
                 imageViewF.setImageResource(R.drawable.baseline_favorite_24);
             }
@@ -315,7 +315,7 @@ public class PlayerFullView {
         }
 
         //set favourite song icon
-        if (favSong.checkSongIsPresentInFav(currentSongInfo.getPath())) {
+        if (favSong.checkSongIsPresentInFav(currentSongInfo)) {
             imageViewF.setImageResource(R.drawable.baseline_favorite_24);
         }else imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
 
