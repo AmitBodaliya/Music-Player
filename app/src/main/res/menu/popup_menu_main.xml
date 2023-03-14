@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+
+
+
+    <item
+        android:id="@+id/refreshList"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"
+        android:title="@string/refresh"/>
+
+    <item
+        android:id="@+id/itemBothPlay"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"
+        android:title="@string/play_both_deck"/>
+
+
+
+    <item
+        android:id="@+id/idFavourite"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"
+        android:title="@string/favourite_songs"/>
+
+
+
+
+    <item android:id="@+id/item_setting"
+        android:title="@string/setting"
+        app:actionViewClass="android.widget.ToggleButton"
+        android:orderInCategory="80"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/item_main_about"
+        android:title="@string/about"
+        app:actionViewClass="android.widget.ToggleButton"
+        android:orderInCategory="80"
+        app:showAsAction="ifRoom" />
+
+
+
+
+</menu>

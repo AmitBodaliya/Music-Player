@@ -1,4 +1,27 @@
 <resources>
     <string name="app_name">Sound Play</string>
+
+
+
     <string name="todo">Todo</string>
+    <string name="folder">Folder</string>
+    <string name="favorites">Favorites</string>
+    <string name="songs">Songs</string>
+    <string name="now_playing"><![CDATA[Now Playing  >>]]></string>
+    <string name="play">Play</string>
+    <string name="play_next">Play Next</string>
+    <string name="add_to">Add to</string>
+    <string name="queue">Queue</string>
+    <string name="favourite">Favourite</string>
+    <string name="share">Share</string>
+    <string name="song_info">Song Info</string>
+    <string name="about">About</string>
+    <string name="setting">Settings</string>
+    <string name="favourite_songs">Favourite Songs</string>
+    <string name="play_both_deck">Play Both Deck</string>
+    <string name="refresh">Refresh</string>
+    <string name="search">Search</string>
+    <string name="_00_00">00:00</string>
+    <string name="up_next">Up Next</string>
+    <string name="up_next_list">Up Next</string>
 </resources>

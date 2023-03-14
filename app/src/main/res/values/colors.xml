@@ -9,10 +9,15 @@
 
     <color name="colorPrimary">#9BA2AC</color>
     <color name="colorSecondary">#EBEBEB</color>
+    <color name="fadeColorSecondary">#B1B1B1</color>
+    <color name="colorSecondaryVar">#C2C2C2</color>
 
     <color name="colorAccent">#F44336</color>
+    <color name="colorDull">#66000000</color>
     <color name="textColor">@color/black</color>
     <color name="fadeTextColor">#202020</color>
+    <color name="tabSelectTextColor">#000000</color>
     <color name="colorControlNormal">@color/black</color>
+    <color name="divider_color">#E6FFFFFF</color>
 
 </resources>

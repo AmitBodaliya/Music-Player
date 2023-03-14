@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/item_play"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom|withText"
+        android:title="@string/play"/>
+
+    <item
+        android:id="@+id/item2"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="ifRoom|withText"
+        android:title="@string/play_next"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/item3"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"
+        android:visible="false"
+        android:title="@string/add_to">
+
+        <menu>
+
+            <item
+                android:id="@+id/item4"
+                android:title="@string/queue"/>
+
+            <item
+                android:id="@+id/item5"
+                android:title="@string/favourite"/>
+
+        </menu>
+    </item>
+
+
+</menu>

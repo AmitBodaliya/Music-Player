@@ -21,7 +21,7 @@
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="27">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
-        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorSecondary</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
     </style>
 
@@ -34,7 +34,7 @@
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorSecondary</item>
         <item name="android:windowIsFloating">false</item>
         //change button text color
     </style>
@@ -49,5 +49,28 @@
         <item name="android:textColor">@color/colorControlNormal</item>
     </style>
 
+    <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="elevation">@dimen/cardElevation</item>
+        <item name="android:popupElevation">5dp</item>
+        <item name="popupMenuBackground">@drawable/drawable_menu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenuBGStyle</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+    <style name="PopupMenuBGStyle" parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:popupBackground">@drawable/drawable_menu</item>
+    </style>
+
+
+
+    // animation theme
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+    <style name="SlidingDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_bottom</item>
+    </style>
 
 </resources>
