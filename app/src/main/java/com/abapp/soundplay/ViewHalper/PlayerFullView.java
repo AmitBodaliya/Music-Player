@@ -289,12 +289,13 @@ public class PlayerFullView {
 
 
     public void dismissDialog(){
-        alertDialog.dismiss();
+        if (alertDialog != null) alertDialog.dismiss();
     }
 
 
 
     public void refreshView(boolean showDialog){
+        if (alertDialog == null) return;
 
         //set values ///////////////////////////////////////////////////////////////////////////////
 

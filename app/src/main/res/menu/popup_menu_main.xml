@@ -17,6 +17,7 @@
         android:id="@+id/itemBothPlay"
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="never"
+        android:visible="false"
         android:title="@string/play_both_deck"/>
 
 

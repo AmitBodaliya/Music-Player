@@ -119,7 +119,7 @@ public class SplashActivity extends AppCompatActivity {
 
             run = false;
             Intent homeIntent = new Intent(SplashActivity.this, MainActivity.class);
-            homeIntent.putExtra("arrayList", arrayList);
+            homeIntent.putParcelableArrayListExtra("arrayList", arrayList);
             startActivity(homeIntent);
             finish();
         }

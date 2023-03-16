@@ -24,4 +24,5 @@
     <string name="_00_00">00:00</string>
     <string name="up_next">Up Next</string>
     <string name="up_next_list">Up Next</string>
+    <string name="title">Title</string>
 </resources>

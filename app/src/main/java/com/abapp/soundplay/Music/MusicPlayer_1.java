@@ -18,8 +18,7 @@ public class MusicPlayer_1 {
         this.context = context;
     }
 
-
-    public void setMusic(SongsInfo songsInfo){
+     public void setMusic(SongsInfo songsInfo){
         this.songsInfo = songsInfo;
 
         stopMusic();
@@ -27,24 +26,46 @@ public class MusicPlayer_1 {
         mediaPlayer = MediaPlayer.create(context, Uri.fromFile(songsInfo.getPath()));
         mediaPlayer.setVolume(1.0f , 1.0f);
 
+        mediaPlayer.setOnCompletionListener(mp -> {
+            if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicComplete(mediaPlayer);
+        });
+
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
+
+    }
+
+
+     public void setMusicAndStart(SongsInfo songsInfo){
+        this.songsInfo = songsInfo;
+
+        stopMusic();
+
+        mediaPlayer = MediaPlayer.create(context, Uri.fromFile(songsInfo.getPath()));
+        mediaPlayer.setVolume(1.0f , 1.0f);
+        mediaPlayer.start();
+
 
         mediaPlayer.setOnCompletionListener(mp -> {
             if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicComplete(mediaPlayer);
         });
 
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
 
     }
 
     public void startMusic(){
         if (mediaPlayer != null) mediaPlayer.start();
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
     }
 
     public void pauseMusic(){
         if (mediaPlayer != null) mediaPlayer.pause();
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
     }
 
     public void stopMusic(){
         if (mediaPlayer != null) mediaPlayer.stop();
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
     }
 
     public void setVolume(int v){
@@ -101,6 +122,7 @@ public class MusicPlayer_1 {
     // parent activity will implement this method to respond to click events
     public interface OnTaskCompletionListener {
         void onMusicComplete(MediaPlayer mediaPlayer) ;
+        void onMusicChange(MediaPlayer mediaPlayer, SongsInfo songsInfo) ;
     }
 
 
