@@ -106,8 +106,10 @@ public class MusicPlayer_1 {
     }
 
     public void destroyPlayer(){
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
 

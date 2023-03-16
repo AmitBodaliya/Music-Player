@@ -1,6 +1,5 @@
 package com.abapp.soundplay.Fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +16,12 @@ import com.abapp.soundplay.R;
 public class FragmentHome extends Fragment {
 
     View v;
-    Context context;
 
     LinearLayout allSongLayout ,folderLayout, favLayout;
     CardView nowPlaying;
 
 
-    public FragmentHome(Context context) {
-        this.context = context;
+    public FragmentHome() {
     }
 
 

@@ -32,11 +32,11 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
 
         Fragment[] fragments  = {
-                new FragmentHome(context) ,
-                new FragmentAllSong(context , arrayList),
-                new FragmentAlbum(context , arrayList),
-                new FragmentArtists(context , arrayList),
-                new FragmentFolders(context)
+                new FragmentHome() ,
+                new FragmentAllSong(arrayList),
+                new FragmentAlbum(arrayList),
+                new FragmentArtists(arrayList),
+                new FragmentFolders()
         };
 
         return fragments[position];

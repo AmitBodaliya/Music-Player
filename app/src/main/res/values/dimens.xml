@@ -5,7 +5,7 @@
     <dimen name="toolbar_height">60dp</dimen>
 
     //elevation
-    <dimen name="cardElevation">5dp</dimen>
+    <dimen name="cardElevation">2dp</dimen>
     <dimen name="actionElevation">5dp</dimen>
 
     //radius

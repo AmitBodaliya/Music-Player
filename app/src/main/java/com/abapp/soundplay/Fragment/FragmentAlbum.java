@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,9 +29,17 @@ public class FragmentAlbum extends Fragment {
     RVAAlbumArtists adapter;
     ArrayList<SongsInfo> arrayList;
 
-    public FragmentAlbum(Context context , ArrayList<SongsInfo> arrayList){
-        this.context = context;
+    public FragmentAlbum() {
+    }
+
+    public FragmentAlbum(ArrayList<SongsInfo> arrayList){
         this.arrayList = arrayList;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("ARRAY_LIST", arrayList);
     }
 
 
@@ -38,7 +47,12 @@ public class FragmentAlbum extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_album, container, false);
 
+        context = requireActivity();
         recyclerView = v.findViewById(R.id.recyclerViewAlbum);
+
+        if (savedInstanceState != null) {
+            arrayList = savedInstanceState.getParcelableArrayList("ARRAY_LIST");
+        }
 
         extractAlbumList(arrayList);
         return v;

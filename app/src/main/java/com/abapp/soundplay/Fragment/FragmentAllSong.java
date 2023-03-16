@@ -1,11 +1,11 @@
 package com.abapp.soundplay.Fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,12 +20,19 @@ import java.util.ArrayList;
 
 public class FragmentAllSong extends Fragment {
 
-    Context context;
     ArrayList<SongsInfo> arrayList;
 
-    public FragmentAllSong(Context context, ArrayList<SongsInfo> arrayList){
-        this.context = context;
+    public FragmentAllSong() {
+    }
+
+    public FragmentAllSong(ArrayList<SongsInfo> arrayList){
         this.arrayList = arrayList;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("ARRAY_LIST", arrayList);
     }
 
 
@@ -35,9 +42,13 @@ public class FragmentAllSong extends Fragment {
 
         RecyclerView recyclerView = v.findViewById(R.id.recyclerViewAllSOng);
 
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(context, arrayList);
+        if (savedInstanceState != null) {
+            arrayList = savedInstanceState.getParcelableArrayList("ARRAY_LIST");
+        }
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(requireContext(), arrayList);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
 

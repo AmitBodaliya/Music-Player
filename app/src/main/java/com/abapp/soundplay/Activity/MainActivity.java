@@ -774,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
 
         unregisterReceiver(broadcastReceiver);
-        unregisterReceiver(mHeadsetReceiver);
+//        unregisterReceiver(mHeadsetReceiver);
         mediaSession.release();
 
     }

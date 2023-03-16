@@ -1,6 +1,5 @@
 package com.abapp.soundplay.Fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -26,7 +25,6 @@ import java.util.List;
 
 public class FragmentFolders extends Fragment {
 
-    Context context;
     RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter ;
 
@@ -40,10 +38,8 @@ public class FragmentFolders extends Fragment {
     String defaultFile = Environment.getExternalStorageDirectory() + "";
 
 
-    public FragmentFolders(Context context){
-        this.context = context;
+    public FragmentFolders(){
         this.uri = Environment.getExternalStorageDirectory();
-        fetchFileData = new FetchFileData(context);
     }
 
 
@@ -51,6 +47,7 @@ public class FragmentFolders extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_folders, container, false);
 
+        fetchFileData = new FetchFileData(requireContext());
 
         //ints
         recyclerView = v.findViewById(R.id.recyclerViewFolders);
@@ -97,7 +94,7 @@ public class FragmentFolders extends Fragment {
 
         Collections.reverse(mTexts);
         recyclerViewPath.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false);
         linearLayoutManager.scrollToPosition(mTexts.size() - 1);
         recyclerViewPath.setLayoutManager(linearLayoutManager);
         folderPathAdapter = new FolderPathAdapter(mTexts);
@@ -114,9 +111,9 @@ public class FragmentFolders extends Fragment {
 
         mySongDirList.addAll(mySongList);
 
-        recyclerViewAdapter = new RecyclerViewAdapter(context , mySongDirList);
+        recyclerViewAdapter = new RecyclerViewAdapter(requireContext() , mySongDirList);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
         recyclerViewAdapter.setClickListener(new RecyclerViewAdapter.ItemClickListener() {
