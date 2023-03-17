@@ -1,83 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    app:cardCornerRadius="7dp"
+    app:cardElevation="@dimen/cardElevation"
+    android:layout_margin="5dp"
+    android:backgroundTint="@color/colorSecondary">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp"
-        android:elevation="10dp"
-        android:layout_margin="5dp"
-        android:backgroundTint="@color/colorSecondary">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            app:cardCornerRadius="7dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/fadeColorSecondary"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/titleImage"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_person_music"
+                android:contentDescription="@string/todo" />
+
+        </androidx.cardview.widget.CardView>
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                app:cardCornerRadius="10dp"
-                android:elevation="10dp"
-                android:layout_gravity="center">
-
-                <ImageView
-                    android:id="@+id/titleImage"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:layout_gravity="center"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/baseline_music_note_24"
-                    android:contentDescription="@string/todo" />
-
-            </androidx.cardview.widget.CardView>
-
-
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/artistName"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:textSize="13sp"
+                android:paddingHorizontal="5dp" />
 
-                <TextView
-                    android:id="@+id/artistName"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:singleLine="true"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="5dp" />
-
-
-                <ImageView
-                    android:id="@+id/artistMenu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0"
-                    android:padding="4dp"
-                    android:src="@drawable/baseline_more_vert_24"
-                    android:contentDescription="@string/todo" />
-
-
-
-
-            </LinearLayout>
-
-
-
+            <ImageView
+                android:id="@+id/artistMenu"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="6dp"
+                android:layout_weight="0"
+                android:src="@drawable/baseline_more_vert_24"
+                android:contentDescription="@string/todo" />
 
         </LinearLayout>
 
 
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>

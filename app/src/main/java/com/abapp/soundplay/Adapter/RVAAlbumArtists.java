@@ -130,7 +130,7 @@ public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHo
 
         @Override
         protected void onPreExecute() {
-            imageView.setImageResource(R.drawable.baseline_music_note_24);
+            imageView.setImageResource(R.drawable.baseline_person_music);
             super.onPreExecute();
         }
 
@@ -153,7 +153,7 @@ public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHo
         @SuppressLint("SetTextI18n")
         @Override
         protected void onPostExecute(Bitmap  bitmap) {
-            if(bitmap == null) imageView.setImageResource(R.drawable.baseline_music_note_24);
+            if(bitmap == null) imageView.setImageResource(R.drawable.baseline_person_music);
             else {
                 imageView.setImageBitmap(bitmap);
                 albumInfoArrayList.get(position).setTitleImage(bitmap);

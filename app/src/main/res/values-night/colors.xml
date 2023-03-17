@@ -6,12 +6,11 @@
 
 
     <color name="colorPrimary">#19191B</color>
-    <color name="colorSecondary">#3D454D</color>
-    <color name="fadeColorSecondary">#3B3F44</color>
+    <color name="colorSecondary">#31363B</color>
+    <color name="fadeColorSecondary">#383B3E</color>
     <color name="colorSecondaryVar">#2F3439</color>
 
 
-    <color name="colorAccent">#F44336</color>
     <color name="textColor">@color/white</color>
     <color name="fadeTextColor">#BEBEBE</color>
     <color name="tabSelectTextColor">#ffffff</color>

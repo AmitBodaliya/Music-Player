@@ -1,18 +1,16 @@
-package com.abapp.soundplay.ViewHalper;
+package com.abapp.soundplay.Fragment;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Rect;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,53 +21,40 @@ import com.abapp.soundplay.R;
 
 import java.util.ArrayList;
 
-public class SearchView {
+public class FragmentSearch extends Fragment {
+
+    View v;
 
     Context context;
-    Activity activity;
     ArrayList<SongsInfo> arrayList;
-    MainActivity mainActivity;
 
 
     RecyclerView recyclerViewSearch;
     RecyclerViewAdapter adapter;
     ArrayList<SongsInfo> searchResultList;
 
-    //alert dialog.
-    AlertDialog alertDialog;
 
-    public SearchView(Context context,MainActivity mainActivity, ArrayList<SongsInfo> arrayList) {
-        this.context = context;
-        this.mainActivity = mainActivity;
-        this.activity = (Activity) context;
-        this.arrayList = arrayList;
-
+    public FragmentSearch() {
     }
 
 
-    //searchFunction
-    @SuppressLint({"ResourceAsColor", "SetTextI18n", "DefaultLocale"})
-    public void showDialog() {
-        Rect displayRectangle = new Rect();
-        Window window = activity.getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.fragment_search, container, false);
+
+        context = requireContext();
+        arrayList = ((MainActivity) requireContext()).getArrayList();
 
 
-        final AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.FullScreenAlertDialogStyle);
-        View mView = activity.getLayoutInflater().inflate(R.layout.dialog_search_box, null);
+        EditText editTextSearch = v.findViewById(R.id.editTextSearch);
+        ImageView backToHome = v.findViewById(R.id.backSearch);
 
-        mView.setMinimumWidth((int) (displayRectangle.width() * 1f));
-        mView.setMinimumHeight((int) (displayRectangle.height() * 1f));
+        recyclerViewSearch = v.findViewById(R.id.searchRecyclerView);
+        backToHome.setOnClickListener(view -> ((MainActivity) requireActivity()).setDefaultNav());
 
-        EditText editTextSearch = mView.findViewById(R.id.editTextSearch);
-        ImageView backToHome = mView.findViewById(R.id.backSearch);
-        recyclerViewSearch = mView.findViewById(R.id.searchRecyclerView);
 
         showSearchResult(arrayList);
 
-        alert.setView(mView);
-        alertDialog = alert.create();
-        alertDialog.setCanceledOnTouchOutside(false);
 
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -93,16 +78,6 @@ public class SearchView {
             }
         });
 
-
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().getAttributes().windowAnimations = R.style.SlidingDialogAnimation;
-        }
-
-        backToHome.setOnClickListener(v -> alertDialog.dismiss());
-
-
-        alertDialog.show();
-
         editTextSearch.requestFocus();
         editTextSearch.postDelayed(() -> {
             InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -110,7 +85,10 @@ public class SearchView {
         },200);
 
 
+        return v;
     }
+
+
 
 
     public void searchProcess(String searchStringText) {
@@ -137,14 +115,14 @@ public class SearchView {
             public void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
                 ArrayList<SongsInfo> newList = new ArrayList<>();
                 newList.add(songsInfo);
-                mainActivity.onItemClick(view, songsInfo, 0, newList);
+                ((MainActivity) requireActivity()).onItemClick(view, songsInfo, 0, newList);
 
-                alertDialog.dismiss();
+                ((MainActivity) requireActivity()).setDefaultNav();
             }
 
             @Override
             public void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
-                mainActivity.onMenuClick(view, songsInfo , position, list);
+                ((MainActivity) requireActivity()).onMenuClick(view, songsInfo , position, list);
             }
 
         });

@@ -25,26 +25,13 @@ public class FragmentAllSong extends Fragment {
     public FragmentAllSong() {
     }
 
-    public FragmentAllSong(ArrayList<SongsInfo> arrayList){
-        this.arrayList = arrayList;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("ARRAY_LIST", arrayList);
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_allsong, container, false);
 
         RecyclerView recyclerView = v.findViewById(R.id.recyclerViewAllSOng);
 
-        if (savedInstanceState != null) {
-            arrayList = savedInstanceState.getParcelableArrayList("ARRAY_LIST");
-        }
+        arrayList = ((MainActivity) requireActivity()).getArrayList();
 
         RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(requireContext(), arrayList);
 

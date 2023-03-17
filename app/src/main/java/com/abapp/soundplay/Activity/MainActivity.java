@@ -1,7 +1,9 @@
 package com.abapp.soundplay.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -25,6 +27,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,7 +36,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.abapp.soundplay.Adapter.ViewPagerAdapter;
 import com.abapp.soundplay.Gesture.OnSwipeGesture;
 import com.abapp.soundplay.Helper.FavSong;
 import com.abapp.soundplay.Helper.FetchFileData;
@@ -46,25 +48,14 @@ import com.abapp.soundplay.Receiver.Action;
 import com.abapp.soundplay.Receiver.OnClearFromRecentService;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
-import com.abapp.soundplay.ViewHalper.SearchView;
 import com.abapp.soundplay.ViewHalper.ShowListView;
 import com.abapp.soundplay.ViewHalper.SongInfoView;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnTaskCompletionListener {
-
-    //layout
-    String[] tabTitle = {"Home", "Songs", "Album", "Artists", "Folder"};
-
-    TabLayout tabLayout;
-    ViewPager2 viewPager2;
-    ViewPagerAdapter viewPagerAdapter;
-    ImageView searchImageView , expanded_menu;
-
 
     //music payer view
     LinearLayout content_dock_master;
@@ -75,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
 
     //full screen view
+    BottomNavigationView bottomNavigationView;
     PlayerFullView playerFullView;
 
 
@@ -111,12 +103,6 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         setContentView(R.layout.activity_main);
 
 
-        //layout
-        tabLayout =  findViewById(R.id.tabLayout);
-        viewPager2 = findViewById(R.id.viewPager);
-        searchImageView = findViewById(R.id.searchImageView);
-        expanded_menu = findViewById(R.id.expanded_menu);
-
         //music payer view
         content_dock_master = findViewById(R.id.content_dock_master);
         albumImagePlayer = findViewById(R.id.albumImagePlayer);
@@ -125,15 +111,6 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         playPausePlayer = findViewById(R.id.playPausePlayer);
 
         content_dock_master.setVisibility(View.GONE);
-
-
-
-        //onclick
-        expanded_menu.setOnClickListener(this::MainMenu);
-        searchImageView.setOnClickListener(view -> {
-            SearchView searchView1 = new SearchView(MainActivity.this , MainActivity.this, arrayListBackground);
-            searchView1.showDialog();
-        });
 
 
         //set music player
@@ -156,11 +133,30 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         Bundle extras = getIntent().getExtras();
 
 
-        if(extras != null){
+        if(extras == null){
+            Toast.makeText(this, "Something Went Wrong!", Toast.LENGTH_SHORT).show();
+        } else {
+
             arrayListBackground = intent.getParcelableArrayListExtra("arrayList");
-            setViewPager2(arrayListBackground);
+
+            //set bottom nav view
+            bottomNavigationView = findViewById(R.id.bottom_navigation);
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+
         }
 
+    }
+
+    public ArrayList<SongsInfo> getArrayList(){
+        arrayListBackground.sort(SongsInfo.sortByTitle);
+        return arrayListBackground;
+    }
+
+
+    public void setDefaultNav(){
+        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
     }
 
 
@@ -209,34 +205,6 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         }
 
     }
-
-
-
-
-    void setViewPager2(ArrayList<SongsInfo> arrayList){
-        arrayList.sort(SongsInfo.sortByTitle);
-
-        int id = viewPager2.getCurrentItem();
-        viewPagerAdapter = new ViewPagerAdapter(this, this, tabTitle.length, arrayList);
-
-
-        viewPager2.setAdapter(viewPagerAdapter);
-        viewPager2.setCurrentItem(id, false);
-        viewPager2.setOffscreenPageLimit(tabTitle.length - 1);
-
-        new TabLayoutMediator(tabLayout, viewPager2, (tab, position) -> tab.setText(tabTitle[position])).attach();
-    }
-
-    public void setViewPagerItem(int pos){ viewPager2.setCurrentItem(pos , true); }
-
-
-
-
-
-
-
-
-
 
 
     //menu/////////////////////////////////////////////////////////////////////////////////////////////

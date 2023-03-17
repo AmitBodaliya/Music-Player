@@ -9,22 +9,16 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 
 import com.abapp.soundplay.Fragment.*;
-import com.abapp.soundplay.Model.SongsInfo;
-
-import java.io.File;
-import java.util.ArrayList;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
     Context context;
     int totalPage;
-    ArrayList<SongsInfo> arrayList;
 
-    public ViewPagerAdapter(FragmentActivity fm  , Context context , int totalPage  , ArrayList<SongsInfo> arrayList) {
+    public ViewPagerAdapter(FragmentActivity fm  , Context context , int totalPage ) {
         super(fm);
         this.context = context;
         this.totalPage = totalPage;
-        this.arrayList = arrayList;
     }
 
     @NonNull
@@ -32,11 +26,9 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
 
         Fragment[] fragments  = {
-                new FragmentHome() ,
-                new FragmentAllSong(arrayList),
-                new FragmentAlbum(arrayList),
-                new FragmentArtists(arrayList),
-                new FragmentFolders()
+                new FragmentAllSong(),
+                new FragmentAlbum(),
+                new FragmentArtists()
         };
 
         return fragments[position];

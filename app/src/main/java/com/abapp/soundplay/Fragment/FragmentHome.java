@@ -1,6 +1,7 @@
 package com.abapp.soundplay.Fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,9 @@ public class FragmentHome extends Fragment {
         nowPlaying = v.findViewById(R.id.nowPlayingLayout);
 
 
-        allSongLayout.setOnClickListener(v1 -> ((MainActivity) requireActivity()).setViewPagerItem(1));
-
-        folderLayout.setOnClickListener(v1 -> ((MainActivity) requireActivity()).setViewPagerItem(4));
+//        allSongLayout.setOnClickListener(v1 -> ((MainActivity) requireActivity()).setViewPagerItem(1));
+//
+//        folderLayout.setOnClickListener(v1 -> ((MainActivity) requireActivity()).setViewPagerItem(4));
 
         favLayout.setOnClickListener(v1 -> ((MainActivity) requireActivity()).showAllFavSOng());
 

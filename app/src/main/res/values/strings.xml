@@ -25,4 +25,6 @@
     <string name="up_next">Up Next</string>
     <string name="up_next_list">Up Next</string>
     <string name="title">Title</string>
+    <string name="home">Home</string>
+    <string name="library">Library</string>
 </resources>

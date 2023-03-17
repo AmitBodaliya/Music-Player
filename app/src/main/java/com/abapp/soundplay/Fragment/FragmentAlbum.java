@@ -32,16 +32,6 @@ public class FragmentAlbum extends Fragment {
     public FragmentAlbum() {
     }
 
-    public FragmentAlbum(ArrayList<SongsInfo> arrayList){
-        this.arrayList = arrayList;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("ARRAY_LIST", arrayList);
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,9 +40,7 @@ public class FragmentAlbum extends Fragment {
         context = requireActivity();
         recyclerView = v.findViewById(R.id.recyclerViewAlbum);
 
-        if (savedInstanceState != null) {
-            arrayList = savedInstanceState.getParcelableArrayList("ARRAY_LIST");
-        }
+        arrayList = ((MainActivity) requireActivity()).getArrayList();
 
         extractAlbumList(arrayList);
         return v;

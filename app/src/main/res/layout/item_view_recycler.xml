@@ -4,18 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/itemViewRecycler"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:paddingHorizontal="15dp"
+    android:layout_height="64dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="10dp"
     android:orientation="horizontal"
     android:background="?attr/selectableItemBackground">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_weight="0"
         app:cardElevation="0dp"
         app:cardCornerRadius="7dp"
-        app:cardBackgroundColor="@android:color/transparent"
+        app:cardBackgroundColor="@color/colorSecondaryVar"
         android:layout_gravity="center">
 
         <ImageView
@@ -44,7 +45,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/playerTitleArtist"
@@ -52,7 +53,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textColor="@color/fadeTextColor"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
     </LinearLayout>
 
