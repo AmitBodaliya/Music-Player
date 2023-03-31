@@ -24,8 +24,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String favSOng = "CREATE TABLE " + Params.TABLE_NAME + " (" + Params.SONG_PATH +   " TEXT PRIMARY KEY," + Params.SONGS_TITLE + " TEXT," + Params.SONGS_ARTISTS + " TEXT," + Params.SONGS_ALBUM + " TEXT," + Params.SONGS_LENGTH + " TEXT)" ;
+        String favSOng = "CREATE TABLE " + Params.FAV_TABLE_NAME + " (" + Params.SONG_PATH +   " TEXT PRIMARY KEY," + Params.SONGS_TITLE + " TEXT," + Params.SONGS_ARTISTS + " TEXT," + Params.SONGS_ALBUM + " TEXT," + Params.SONGS_LENGTH + " TEXT)" ;
+        String history = "CREATE TABLE " + Params.HISTORY_TABLE_NAME + " (" + Params.SONG_PATH +   " TEXT PRIMARY KEY," + Params.SONGS_TITLE + " TEXT," + Params.SONGS_ARTISTS + " TEXT," + Params.SONGS_ALBUM + " TEXT," + Params.SONGS_LENGTH + " TEXT)" ;
         db.execSQL(favSOng);
+        db.execSQL(history);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(Params.SONGS_LENGTH , songsInfo.getSongLength());
 
 
-        sqLiteDatabase.insert(Params.TABLE_NAME , null , values);
+        sqLiteDatabase.insert(Params.FAV_TABLE_NAME , null , values);
         sqLiteDatabase.close();
     }
 
@@ -54,7 +56,50 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
-        String SELECT = "SELECT * FROM " + Params.TABLE_NAME;
+        String SELECT = "SELECT * FROM " + Params.FAV_TABLE_NAME;
+        @SuppressLint("Recycle") Cursor cursor = sqLiteDatabase.rawQuery(SELECT , null);
+
+        if(cursor.moveToFirst()){
+            do{
+                SongsInfo songsInfo = new SongsInfo();
+
+                songsInfo.setPath(new File(cursor.getString(0)));
+                songsInfo.setTitle(cursor.getString(1));
+                songsInfo.setArtist(cursor.getString(2));
+                songsInfo.setAlbum(cursor.getString(3));
+                songsInfo.setSongLength(cursor.getString(4));
+
+                if(songsInfo.getPath().exists()) finalList.add(songsInfo);
+                else deleteFavSongById(songsInfo.getPath());
+
+            }while (cursor.moveToNext());
+        }
+        return finalList;
+    }
+
+
+    // aad data using Song class in sql data base
+    public void addToHistory(SongsInfo songsInfo){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Params.SONG_PATH , songsInfo.getPath().toString());
+        values.put(Params.SONGS_TITLE , songsInfo.getTitle());
+        values.put(Params.SONGS_ARTISTS , songsInfo.getArtist());
+        values.put(Params.SONGS_ALBUM , songsInfo.getAlbum());
+        values.put(Params.SONGS_LENGTH , songsInfo.getSongLength());
+
+
+        sqLiteDatabase.insert(Params.HISTORY_TABLE_NAME , null , values);
+        sqLiteDatabase.close();
+    }
+
+    public ArrayList<SongsInfo> getAllHistory(){
+        ArrayList<SongsInfo> finalList = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        String SELECT = "SELECT * FROM " + Params.HISTORY_TABLE_NAME;
         @SuppressLint("Recycle") Cursor cursor = sqLiteDatabase.rawQuery(SELECT , null);
 
         if(cursor.moveToFirst()){
@@ -87,9 +132,27 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
 
+    public boolean songIsInHistory(File path){
+
+        for(SongsInfo songsInfo : getAllHistory()){
+            if(songsInfo.getPath().toString().equals(path.toString())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public void deleteFavSongById(File file){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(Params.TABLE_NAME, Params.SONG_PATH +"=?", new String[]{file.toString()});
+        db.delete(Params.FAV_TABLE_NAME, Params.SONG_PATH +"=?", new String[]{file.toString()});
+        db.close();
+    }
+
+
+    public void deleteHistoryById(File file){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(Params.HISTORY_TABLE_NAME, Params.SONG_PATH +"=?", new String[]{file.toString()});
         db.close();
     }
 

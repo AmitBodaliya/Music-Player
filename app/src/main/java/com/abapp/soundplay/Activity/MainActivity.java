@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +38,7 @@ import android.widget.Toast;
 import com.abapp.soundplay.Gesture.OnSwipeGesture;
 import com.abapp.soundplay.Helper.FavSong;
 import com.abapp.soundplay.Helper.FetchFileData;
+import com.abapp.soundplay.Helper.HistorySong;
 import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
 import com.abapp.soundplay.Model.SongsInfo;
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
     UniqueIdGen uniqueIdGen;
     FavSong favSong;
+    HistorySong historySong;
 
     //notification
     NotificationManager notificationManager;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("TAG", "onCreate()");
 
         //music payer view
         content_dock_master = findViewById(R.id.content_dock_master);
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
         uniqueIdGen = UniqueIdGen.getInstance();
         favSong = new FavSong(this);
+        historySong = new HistorySong(this);
         mediaMetaData = new MediaMetaData(this);
         fetchFileData = new FetchFileData(this);
 
@@ -138,25 +141,26 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         } else {
 
             arrayListBackground = intent.getParcelableArrayListExtra("arrayList");
+            arrayListBackground.sort(SongsInfo.sortByTitle);
 
             //set bottom nav view
             bottomNavigationView = findViewById(R.id.bottom_navigation);
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
             NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
+            setDefaultNav();
 
         }
 
     }
 
     public ArrayList<SongsInfo> getArrayList(){
-        arrayListBackground.sort(SongsInfo.sortByTitle);
         return arrayListBackground;
     }
 
 
     public void setDefaultNav(){
-        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_main);
     }
 
 
@@ -388,6 +392,13 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
     }
 
 
+    public void showHistory() {
+        if (favSong.isListEmpty())
+            Toast.makeText(this, "No History", Toast.LENGTH_SHORT).show();
+        else new ShowListView(this , this, "History" , historySong.getAllHistory());
+    }
+
+
 
 
 
@@ -443,6 +454,12 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
     public void onMusicComplete(MediaPlayer mediaPlayer) {
         nextSong();
     }
+
+    @Override
+    public void onMusicSet(MediaPlayer mediaPlayer, SongsInfo songsInfo) {
+        historySong.addToHistory(songsInfo);
+    }
+
 
     @Override
     public void onMusicChange(MediaPlayer mediaPlayer, SongsInfo songsInfo) {
@@ -580,7 +597,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
                     playerFullView.updateData(musicPlayer_1, currentSong);
                     playerFullView.updateUpNextList(upNextList);
                     playerFullView.refreshView(false);
-                }
+                }else changeView(currentSong);
                 break;
             }
         }
@@ -747,4 +764,8 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
     }
 
+    @Override
+    public void onBackPressed() {
+        setDefaultNav();
+    }
 }

@@ -50,6 +50,7 @@ public class MusicPlayer_1 {
         });
 
         if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicChange(mediaPlayer , songsInfo);
+        if (onTaskCompletionListener != null) onTaskCompletionListener.onMusicSet(mediaPlayer , songsInfo);
 
     }
 
@@ -125,6 +126,7 @@ public class MusicPlayer_1 {
     public interface OnTaskCompletionListener {
         void onMusicComplete(MediaPlayer mediaPlayer) ;
         void onMusicChange(MediaPlayer mediaPlayer, SongsInfo songsInfo) ;
+        void onMusicSet(MediaPlayer mediaPlayer, SongsInfo songsInfo) ;
     }
 
 

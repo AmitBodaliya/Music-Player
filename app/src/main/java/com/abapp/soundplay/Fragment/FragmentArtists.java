@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,8 +28,7 @@ public class FragmentArtists extends Fragment {
     RVAAlbumArtists adapter;
     ArrayList<SongsInfo> arrayList;
 
-    public FragmentArtists() {
-    }
+    public FragmentArtists() {}
 
 
     @Override
@@ -87,8 +85,8 @@ public class FragmentArtists extends Fragment {
 
         adapter.setClickListener(new RVAAlbumArtists.ItemClickListener() {
             @Override
-            public void onItemClick(String artistName , int pos , ArrayList<SongsInfo> list) {
-                ((MainActivity) requireActivity()).showSongListDialog("" +  artistList.get(pos).getTitle() , list);
+            public void onItemClick(String artistName , int position, ArrayList<SongsInfo> list) {
+                ((MainActivity) requireActivity()).showSongListDialog("" +  artistList.get(position).getTitle() , list);
 
         }
 

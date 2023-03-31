@@ -26,6 +26,7 @@ public class FragmentSearch extends Fragment {
     View v;
 
     Context context;
+    EditText editTextSearch;
     ArrayList<SongsInfo> arrayList;
 
 
@@ -46,11 +47,14 @@ public class FragmentSearch extends Fragment {
         arrayList = ((MainActivity) requireContext()).getArrayList();
 
 
-        EditText editTextSearch = v.findViewById(R.id.editTextSearch);
+        editTextSearch = v.findViewById(R.id.editTextSearch);
         ImageView backToHome = v.findViewById(R.id.backSearch);
 
         recyclerViewSearch = v.findViewById(R.id.searchRecyclerView);
-        backToHome.setOnClickListener(view -> ((MainActivity) requireActivity()).setDefaultNav());
+        backToHome.setOnClickListener(view -> {
+            ((MainActivity) requireActivity()).setDefaultNav();
+            editTextSearch.setText("");
+        });
 
 
         showSearchResult(arrayList);
@@ -118,6 +122,7 @@ public class FragmentSearch extends Fragment {
                 ((MainActivity) requireActivity()).onItemClick(view, songsInfo, 0, newList);
 
                 ((MainActivity) requireActivity()).setDefaultNav();
+                editTextSearch.setText("");
             }
 
             @Override

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,7 @@ import com.abapp.soundplay.R;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder> {
 
     Context context;
     ArrayList<SongsInfo> mData;
@@ -29,7 +28,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
     // data is passed into the constructor
-    public RecyclerViewAdapter(Context context, ArrayList<SongsInfo> data) {
+    public RAHHorizontal(Context context, ArrayList<SongsInfo> data) {
         this.mData = data;
         this.context = context;
 
@@ -41,7 +40,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_view_recycler, parent, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_view_recycler_grid, parent, false));
     }
 
 
@@ -53,38 +52,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         SongsInfo songsInfo = mData.get(position);
 
         String nameOfSOng = songsInfo.getTitle();
+        nameOfSOng = nameOfSOng.lastIndexOf(".") > 0 ? nameOfSOng.substring(0, nameOfSOng.lastIndexOf(".")) : nameOfSOng;
 
-        if (songsInfo.getPath().isDirectory()) {
-            holder.myTextView.setText(nameOfSOng);
+        holder.myTextView.setText(nameOfSOng);
+        holder.playerArtists.setText(songsInfo.getArtist());
 
-            holder.imageViewID.setImageResource(R.drawable.baseline_folder_24);
-
-            holder.layoutPlayerImage.setBackgroundResource(0);
-            holder.menuImage.setVisibility(View.GONE);
-            holder.playerArtist.setVisibility(View.GONE);
-            holder.playerSongLength.setVisibility(View.GONE);
-
-        } else {
-            holder.layoutPlayerImage.setBackgroundResource(R.color.colorSecondaryVar);
-            nameOfSOng = nameOfSOng.lastIndexOf(".") > 0 ? nameOfSOng.substring(0, nameOfSOng.lastIndexOf(".")) : nameOfSOng;
-
-            holder.myTextView.setText(nameOfSOng);
-
-            //            set song bitmap
-            Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
-            if (testBitmap != null) {
-                holder.imageViewID.setImageBitmap(testBitmap);
-            }
-
-
-            //set artist
-            if (songsInfo.getArtist().equals("")) holder.playerArtist.setText("<unknown>");
-            else holder.playerArtist.setText(songsInfo.getArtist());
-
-
-            //set duration
-            if (!songsInfo.getSongLength().equals("")) holder.playerSongLength.setText(songsInfo.getSongLength());
-
+//            set song bitmap
+        Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
+        if (testBitmap != null) {
+            holder.imageViewID.setImageBitmap(testBitmap);
         }
 
 
@@ -113,18 +89,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     // stores and recycles views as they are scrolled off screen
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout layoutPlayerImage;
-        TextView myTextView, playerSongLength, playerArtist;
+        TextView myTextView, playerArtists;
         ImageView imageViewID, menuImage;
 
         ViewHolder(View itemView) {
             super(itemView);
-            layoutPlayerImage = itemView.findViewById(R.id.layoutPlayerImage);
+            playerArtists = itemView.findViewById(R.id.playerArtists);
             myTextView = itemView.findViewById(R.id.playerTitle);
             imageViewID = itemView.findViewById(R.id.playerImage);
             menuImage = itemView.findViewById(R.id.playerMenu);
-            playerArtist = itemView.findViewById(R.id.playerTitleArtist);
-            playerSongLength = itemView.findViewById(R.id.lengthOfSong);
         }
 
     }
@@ -144,7 +117,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
-
         void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
     }
 }

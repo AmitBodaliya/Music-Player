@@ -86,8 +86,8 @@ public class FragmentAlbum extends Fragment {
 
         adapter.setClickListener(new RVAAlbumArtists.ItemClickListener() {
             @Override
-            public void onItemClick(String artistName , int pos , ArrayList<SongsInfo> list) {
-                ((MainActivity) requireActivity()).showSongListDialog("" + albumList.get(pos).getTitle() , list);
+            public void onItemClick(String artistName , int position, ArrayList<SongsInfo> list) {
+                ((MainActivity) requireActivity()).showSongListDialog("" + albumList.get(position).getTitle() , list);
             }
 
             @Override

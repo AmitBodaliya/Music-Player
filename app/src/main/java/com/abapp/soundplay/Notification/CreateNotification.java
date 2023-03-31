@@ -11,6 +11,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.abapp.soundplay.Helper.MusicArt;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.Receiver.Action;
@@ -20,16 +21,18 @@ import com.abapp.soundplay.Receiver.NotificationActionService;
 public class CreateNotification {
 
 
+    public static MusicArt musicArt;
     public static Notification notification;
 
     public static void createNotification(Context context, SongsInfo songsInfo, int playButton, int pos, int size) {
+        musicArt = MusicArt.getInstance();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(context, "tag");
 
-            Bitmap icon = songsInfo.getBitmapImage();
+            Bitmap icon = musicArt.getAlbumArt(songsInfo , null);
 
             PendingIntent pendingIntentPrevious;
             int drw_previous;

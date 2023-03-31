@@ -18,7 +18,10 @@
         <LinearLayout
             android:id="@+id/actionBar"
             android:layout_width="match_parent"
-            android:layout_height="65dp"
+            android:layout_height="70dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:gravity="center_vertical"
             android:background="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -27,14 +30,20 @@
             <TextView
                 android:id="@+id/titleUpNextList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/up_next_list"
-                android:textSize="22sp"
-                android:gravity="center"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textSize="21sp"
+                android:gravity="center_vertical"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/subTitleUpNextList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/fadeTextColor"
+                android:gravity="center_vertical"/>
+
 
         </LinearLayout>
 

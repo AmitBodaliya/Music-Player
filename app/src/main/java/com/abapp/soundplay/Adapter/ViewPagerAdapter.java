@@ -28,7 +28,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         Fragment[] fragments  = {
                 new FragmentAllSong(),
                 new FragmentAlbum(),
-                new FragmentArtists()
+                new FragmentArtists(),
+                new FragmentFolders()
         };
 
         return fragments[position];

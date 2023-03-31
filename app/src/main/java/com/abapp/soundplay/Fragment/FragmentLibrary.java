@@ -2,6 +2,7 @@ package com.abapp.soundplay.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ public class FragmentLibrary extends Fragment {
     View view;
     Context context;
 
-    String[] tabTitle = {"Songs", "Album", "Artists"};
+    String[] tabTitle = {"Songs", "Album", "Artists", "Folder"};
 
     //ints
     TabLayout tabLayout;
@@ -35,6 +36,7 @@ public class FragmentLibrary extends Fragment {
         view = inflater.inflate(R.layout.fragment_library, container, false);
         context = requireContext();
 
+        Log.i("TAG", "onCreateView: Library");
 
         tabLayout =  view.findViewById(R.id.tabLayout);
         viewPager2 = view.findViewById(R.id.viewPager);

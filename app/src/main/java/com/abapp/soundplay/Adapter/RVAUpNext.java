@@ -3,9 +3,6 @@ package com.abapp.soundplay.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.abapp.soundplay.Helper.MusicArt;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
 
@@ -27,11 +25,16 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
     ArrayList<SongsInfo> mData;
 
     ItemClickListener mClickListener;
+    int playingSong = -1;
+
+    MusicArt musicArt;
 
     // data is passed into the constructor
     public RVAUpNext(Context context, ArrayList<SongsInfo> data) {
         this.mData = data;
         this.context = context;
+
+        musicArt = MusicArt.getInstance();
     }
 
 
@@ -67,10 +70,10 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
             holder.myTextView.setText(nameOfSOng);
 
 //            set song bitmap
-            Bitmap testBitmap = songsInfo.getBitmapImage();
-            if (testBitmap == null) {
-                new loadAlbumArt(holder.imageViewID, position).execute();
-            } else holder.imageViewID.setImageBitmap(testBitmap);
+            Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
+            if (testBitmap != null) {
+                holder.imageViewID.setImageBitmap(testBitmap);
+            }
 
 
             //set artist
@@ -92,7 +95,23 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
             if (mClickListener != null) mClickListener.onMenuClick(v, songsInfo, position, mData);
         });
 
+        if (playingSong == position){
+            holder.imageViewID.setImageResource(R.drawable.baseline_audio_wave);
+            holder.itemView.setBackgroundResource(R.color.fadeColorSecondary);
+        }else holder.itemView.setBackgroundResource(0);
+
     }
+
+
+    public void setCurrentSOng(int pos){
+        int temp = playingSong;
+        playingSong = pos;
+
+        if (temp != -1) notifyItemChanged(temp);
+
+        notifyItemChanged(playingSong);
+    }
+
 
     //get title first letter
     public String getTitle(int position) {
@@ -130,6 +149,9 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
     @Override
     public void onRowClear(RVAUpNext.ViewHolder myViewHolder) {
         myViewHolder.itemView.setBackgroundResource(0);
+
+        if (mClickListener != null) mClickListener.onItemMoved();
+        notifyItemChanged(playingSong);
     }
 
 
@@ -172,68 +194,8 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
         void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
 
         void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
+        void onItemMoved();
     }
 
-
-
-
-
-
-
-
-
-
-
-    // download thumbnail of video
-    @SuppressLint("StaticFieldLeak")
-    public class loadAlbumArt extends AsyncTask<String, Void, Bitmap> {
-        ImageView imageView;
-        int Position;
-
-        public loadAlbumArt(ImageView showImageView, int pos) {
-            this.imageView = showImageView;
-            this.Position = pos;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            this.imageView.setImageResource(R.drawable.baseline_music_note_24);
-            super.onPreExecute();
-        }
-
-        @Override
-        public Bitmap doInBackground(String[] strings) {
-
-            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-            metaRetriever.setDataSource(mData.get(Position).getPath().toString());
-
-            try {
-                byte[] art = metaRetriever.getEmbeddedPicture();
-                return BitmapFactory.decodeByteArray(art, 0, art.length);
-            } catch (Exception e) {
-                return null;
-            }
-
-        }
-
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-
-            if (bitmap != null) {
-                this.imageView.setImageBitmap(bitmap);
-                mData.get(Position).setBitmapImage(bitmap);
-            } else {
-                if (mData.get(Position).getTitle().endsWith(".mp4") || mData.get(Position).getTitle().endsWith(".mkv")) {
-                    this.imageView.setImageResource(R.drawable.baseline_play_arrow_24);
-                    mData.get(Position).setBitmapImage(BitmapFactory.decodeResource(context.getResources(), R.drawable.baseline_play_arrow_24));
-                } else if (mData.get(Position).getTitle().endsWith(".mp3")) {
-                    this.imageView.setImageResource(R.drawable.baseline_music_note_24);
-                    mData.get(Position).setBitmapImage(BitmapFactory.decodeResource(context.getResources(), R.drawable.baseline_music_note_24));
-                } else this.imageView.setImageResource(R.drawable.baseline_music_note_24);
-            }
-
-        }
-    }
 
 }

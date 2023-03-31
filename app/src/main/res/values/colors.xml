@@ -12,7 +12,7 @@
     <color name="fadeColorSecondary">#B1B1B1</color>
     <color name="colorSecondaryVar">#C2C2C2</color>
 
-    <color name="colorAccent">#4CAF50</color>
+    <color name="colorAccent">#FF9800</color>
     <color name="colorDull">#66000000</color>
     <color name="textColor">@color/black</color>
     <color name="fadeTextColor">#202020</color>

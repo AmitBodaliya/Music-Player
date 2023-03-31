@@ -3,32 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_library">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.abapp.soundplay.Fragment.FragmentHome"
+        android:id="@+id/navigation_main"
+        android:name="com.abapp.soundplay.Fragment.FragmentMain"
         android:label="@string/home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_main"/>
 
     <fragment
         android:id="@+id/navigation_library"
         android:name="com.abapp.soundplay.Fragment.FragmentLibrary"
         android:label="@string/library"
-        tools:layout="@layout/fragment_folders" />
+        tools:layout="@layout/fragment_library" />
 
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.abapp.soundplay.Fragment.FragmentSearch"
         android:label="@string/folder"
-        tools:layout="@layout/fragment_folders" />
+        tools:layout="@layout/fragment_search" />
 
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.abapp.soundplay.Fragment.FragmentFolders"
+        android:name="com.abapp.soundplay.Fragment.FragmentSettings"
         android:label="@string/home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_settings" />
 
 
 

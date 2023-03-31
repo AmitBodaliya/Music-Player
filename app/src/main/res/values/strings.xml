@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">Sound Play</string>
-
+    <string name="app_name">Music Player</string>
 
 
     <string name="todo">Todo</string>
@@ -27,4 +26,7 @@
     <string name="title">Title</string>
     <string name="home">Home</string>
     <string name="library">Library</string>
+    <string name="all_songs">All Songs</string>
+    <string name="history">History</string>
+    <string name="Recent">Recent</string>
 </resources>

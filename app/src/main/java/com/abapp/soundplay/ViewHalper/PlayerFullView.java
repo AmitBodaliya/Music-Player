@@ -64,6 +64,7 @@ public class PlayerFullView {
     SongsInfo currentSongInfo;
 
     //up next list
+    TextView subTitleUpNext;
     ArrayList<SongsInfo> upNextList;
     RecyclerView recyclerViewUpNextList;
     RVAUpNext recyclerViewAdapter;
@@ -128,7 +129,7 @@ public class PlayerFullView {
         timeCurrentFullScreenAlert = mView.findViewById(R.id.timeCurrentScreen);
         seekBarArtScreenFullScreenAlert = mView.findViewById(R.id.seekBarScreen);
 
-
+        subTitleUpNext = mView.findViewById(R.id.subTitleUpNextList);
         recyclerViewUpNextList = mView.findViewById(R.id.upNextListRecyclerView);
         upNextListLayoutFullScreenAlert = mView.findViewById(R.id.upNextLayout);
 
@@ -204,6 +205,7 @@ public class PlayerFullView {
         for (int i = 0; i < upNextList.size(); i++) {
             if (upNextList.get(i).getUniqueID().equals(currentSongInfo.getUniqueID())) {
                 recyclerViewUpNextList.scrollToPosition(i);
+                recyclerViewAdapter.setCurrentSOng(i);
                 break;
             }
         }
@@ -217,7 +219,11 @@ public class PlayerFullView {
             @Override
             public void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
                 mainActivity.onMenuClick(view, songsInfo, position, list);
+            }
 
+            @Override
+            public void onItemMoved() {
+                onListItemChange();
             }
         });
 
@@ -293,11 +299,61 @@ public class PlayerFullView {
     }
 
 
+    @SuppressLint("SetTextI18n")
+    public void onListItemChange(){
+        boolean b = false;
 
+        for (int i = 0; i < upNextList.size(); i++) {
+            if (upNextList.get(i).getUniqueID().equals(currentSongInfo.getUniqueID())) {
+                recyclerViewUpNextList.scrollToPosition(i);
+                recyclerViewAdapter.setCurrentSOng(i);
+
+                subTitleUpNext.setVisibility(View.VISIBLE);
+                subTitleUpNext.setText((i + 1) + " of " + upNextList.size());
+
+
+                if (i + 1 < upNextList.size()) {
+                    nextFullScreenAlert.setImageResource(R.drawable.baseline_skip_next_24);
+                } else nextFullScreenAlert.setImageResource(R.drawable.du_skip_next);
+
+                if (0 <= i - 1) {
+                    previousFullScreenAlert.setImageResource(R.drawable.baseline_skip_previous_24);
+                } else previousFullScreenAlert.setImageResource(R.drawable.du_skip_prev);
+
+                b = true;
+                break;
+            }
+        }
+        if (!b) {
+            recyclerViewAdapter.setCurrentSOng(-1);
+            subTitleUpNext.setVisibility(View.GONE);
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
     public void refreshView(boolean showDialog){
         if (alertDialog == null) return;
 
         //set values ///////////////////////////////////////////////////////////////////////////////
+
+        boolean b = false;
+        for (int i = 0; i < upNextList.size(); i++) {
+            if (upNextList.get(i).getUniqueID().equals(currentSongInfo.getUniqueID())) {
+                recyclerViewUpNextList.scrollToPosition(i);
+                recyclerViewAdapter.setCurrentSOng(i);
+
+                subTitleUpNext.setVisibility(View.VISIBLE);
+                subTitleUpNext.setText((i + 1) + " of " + upNextList.size());
+
+                b = true;
+                break;
+            }
+        }
+        if (!b) {
+            recyclerViewAdapter.setCurrentSOng(-1);
+            subTitleUpNext.setVisibility(View.GONE);
+        }
 
 
         //set album art
