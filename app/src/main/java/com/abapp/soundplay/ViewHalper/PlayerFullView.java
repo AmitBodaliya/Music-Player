@@ -25,22 +25,26 @@ import com.abapp.soundplay.Activity.MainActivity;
 import com.abapp.soundplay.Adapter.ItemMoveCallback;
 import com.abapp.soundplay.Adapter.RVAUpNext;
 import com.abapp.soundplay.Gesture.OnSwipeGesture;
-import com.abapp.soundplay.Helper.FavSong;
 import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.Room.Fav.FavRepository;
+import com.abapp.soundplay.Room.Fav.MyDatabaseFav;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class PlayerFullView {
 
     Context context;
     Activity activity;
     MainActivity mainActivity;
-    MusicPlayer_1 musicPlayer_1;
-    FavSong favSong;
+
+    MusicPlayer_1.MusicBinder musicBinder;
+    FavRepository favRepository;
 
     //music helper
     MediaMetadataRetriever mediaMetadataRetriever;
@@ -75,12 +79,12 @@ public class PlayerFullView {
     AlertDialog alertDialog;
 
 
-    public PlayerFullView(Context context, MainActivity mainActivity, MusicPlayer_1 musicPlayer_1, ArrayList<SongsInfo> upNextList) {
+    public PlayerFullView(Context context, MainActivity mainActivity, MusicPlayer_1.MusicBinder musicBinder, ArrayList<SongsInfo> upNextList) {
         this.context = context;
         this.activity = (Activity) context;
         this.mainActivity = mainActivity;
-        this.musicPlayer_1 = musicPlayer_1;
-        this.currentSongInfo = musicPlayer_1.getSongsInfo();
+        this.musicBinder = musicBinder;
+        this.currentSongInfo = musicBinder.getCurrentSongInfo();
         this.upNextList = upNextList;
 
 
@@ -89,7 +93,7 @@ public class PlayerFullView {
         mediaMetadataRetriever.setDataSource(String.valueOf(currentSongInfo.getPath()));
         this.mediaMetaData = new MediaMetaData(context);
 
-        favSong = new FavSong(context);
+        favRepository = new FavRepository(MyDatabaseFav.getDatabase(context));
     }
 
 
@@ -244,33 +248,35 @@ public class PlayerFullView {
         cancelFullScreenAlert.setOnClickListener(v -> alertDialog.dismiss());
 
         //next song
-        nextFullScreenAlert.setOnClickListener(v -> mainActivity.nextSong());
+        nextFullScreenAlert.setOnClickListener(v -> musicBinder.nextSong());
 
         //previous song
-        previousFullScreenAlert.setOnClickListener(v -> mainActivity.previousSong());
+        previousFullScreenAlert.setOnClickListener(v -> musicBinder.previousSong());
 
 
         //favourite song icon on click
         imageViewF.setOnClickListener(v -> {
-            if (favSong.checkSongIsPresentInFav(currentSongInfo)) {
-                imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
-                Toast.makeText(context, "Remove from Favourite", Toast.LENGTH_SHORT).show();
-                favSong.removeFavouriteSong(currentSongInfo.getPath());
-            } else {
-                favSong.addToFavourite(currentSongInfo);
-                Toast.makeText(context, "Added to Favourite", Toast.LENGTH_SHORT).show();
-                imageViewF.setImageResource(R.drawable.baseline_favorite_24);
-            }
+            Executor executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+                if (favRepository.isPresent(currentSongInfo.getPath())){
+                    imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
+                    favRepository.delete(currentSongInfo);
+                } else {
+                    favRepository.insert(currentSongInfo);
+                    imageViewF.setImageResource(R.drawable.baseline_favorite_24);
+                }
+            });
+
         });
 
 
         //on play pause click
         playPauseFullScreenAlert.setOnClickListener(v -> {
-            if (musicPlayer_1.isMusicPlaying()) {
-                musicPlayer_1.pauseMusic();
+            if (musicBinder.isMusicPlaying()) {
+                musicBinder.pauseMusic();
                 playPauseFullScreenAlert.setImageResource(R.drawable.play_drawable);
             } else {
-                musicPlayer_1.startMusic();
+                musicBinder.playMusic();
                 playPauseFullScreenAlert.setImageResource(R.drawable.baseline_pause_24);
             }
         });
@@ -282,9 +288,9 @@ public class PlayerFullView {
 
 
 
-    public void updateData(MusicPlayer_1 musicPlayer_1, SongsInfo currentSongInfo){
-        this.musicPlayer_1 = musicPlayer_1;
-        this.currentSongInfo = currentSongInfo;
+    public void updateData(MusicPlayer_1.MusicBinder musicBinder){
+        this.musicBinder = musicBinder;
+        this.currentSongInfo = musicBinder.getCurrentSongInfo();
     }
 
 
@@ -365,16 +371,19 @@ public class PlayerFullView {
         }
 
 
-        if (musicPlayer_1.isMusicPlaying()) {
+        if (musicBinder.isMusicPlaying()) {
             playPauseFullScreenAlert.setImageResource(R.drawable.baseline_pause_24);
         } else {
             playPauseFullScreenAlert.setImageResource(R.drawable.play_drawable);
         }
 
         //set favourite song icon
-        if (favSong.checkSongIsPresentInFav(currentSongInfo)) {
-            imageViewF.setImageResource(R.drawable.baseline_favorite_24);
-        }else imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            if (favRepository.isPresent(currentSongInfo.getPath())){
+                imageViewF.setImageResource(R.drawable.baseline_favorite_24);
+            }else imageViewF.setImageResource(R.drawable.baseline_favorite_border_24);
+        });
 
 
         //set next prev enable or not
@@ -397,7 +406,7 @@ public class PlayerFullView {
         }
 
         //set title and artist
-        titleTextFullScreenAlert.setText(currentSongInfo.getTitle().substring(0, currentSongInfo.getTitle().lastIndexOf(".")));
+        titleTextFullScreenAlert.setText(currentSongInfo.getTitle1());
         titleArtistFullScreenAlert.setText(currentSongInfo.getArtist());
         timeDuringFullScreenAlert.setText(currentSongInfo.getSongLength());
 
@@ -407,7 +416,7 @@ public class PlayerFullView {
 
 
 //        set seek Bar max
-        seekBarArtScreenFullScreenAlert.setMax(musicPlayer_1.getDuration());
+        seekBarArtScreenFullScreenAlert.setMax(musicBinder.getDuration());
 
 
         //set seek change
@@ -415,7 +424,7 @@ public class PlayerFullView {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    musicPlayer_1.setSeekTo(progress);
+                    musicBinder.setSeekTo(progress);
 
                     //set time update
                     String finalTime;
@@ -448,7 +457,7 @@ public class PlayerFullView {
 
             @Override
             public void run() {
-                int mCurrentPosition = musicPlayer_1.getCurrentPosition();
+                int mCurrentPosition = musicBinder.getCurrentPosition();
 
                 //set time update
                 String finalTime;

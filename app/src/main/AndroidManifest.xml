@@ -110,6 +110,13 @@
 
 
 
+        <service
+
+            android:name=".Music.MusicPlayer_1"
+            android:foregroundServiceType="mediaPlayback">
+
+        </service>
+
 
         <receiver
             android:name=".Receiver.BluetoothConnectionStateReceiver"

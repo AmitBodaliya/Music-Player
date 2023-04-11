@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +18,7 @@ import com.abapp.soundplay.Adapter.RVAAlbumArtists;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.Model.AlbumInfo;
 import com.abapp.soundplay.Model.SongsInfo;
+import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 
 import java.util.ArrayList;
 
@@ -27,7 +28,8 @@ public class FragmentAlbum extends Fragment {
 
     RecyclerView recyclerView;
     RVAAlbumArtists adapter;
-    ArrayList<SongsInfo> arrayList;
+
+    LiveDataViewModel liveDataViewModel;
 
     public FragmentAlbum() {
     }
@@ -40,9 +42,11 @@ public class FragmentAlbum extends Fragment {
         context = requireActivity();
         recyclerView = v.findViewById(R.id.recyclerViewAlbum);
 
-        arrayList = ((MainActivity) requireActivity()).getArrayList();
 
-        extractAlbumList(arrayList);
+        //get list
+        liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
+        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), this::extractAlbumList);
+
         return v;
     }
 

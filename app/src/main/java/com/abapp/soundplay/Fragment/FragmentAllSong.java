@@ -5,8 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,12 +15,13 @@ import com.abapp.soundplay.Activity.MainActivity;
 import com.abapp.soundplay.Adapter.RecyclerViewAdapter;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 
 import java.util.ArrayList;
 
 public class FragmentAllSong extends Fragment {
 
-    ArrayList<SongsInfo> arrayList;
+    LiveDataViewModel liveDataViewModel;
 
     public FragmentAllSong() {
     }
@@ -31,7 +32,16 @@ public class FragmentAllSong extends Fragment {
 
         RecyclerView recyclerView = v.findViewById(R.id.recyclerViewAllSOng);
 
-        arrayList = ((MainActivity) requireActivity()).getArrayList();
+
+        //get list
+        liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
+        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), arrayList -> setRecyclerView(recyclerView, arrayList));
+
+        return v;
+    }
+
+    void setRecyclerView(RecyclerView recyclerView, ArrayList<SongsInfo> arrayList){
+
 
         RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(requireContext(), arrayList);
 
@@ -51,8 +61,6 @@ public class FragmentAllSong extends Fragment {
             }
         });
 
-
-        return v;
     }
 
 }

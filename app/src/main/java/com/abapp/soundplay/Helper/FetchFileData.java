@@ -49,7 +49,7 @@ public class FetchFileData {
                         for (String ext : songExtensions) {
                             if (myFile.getName().endsWith(ext) && !myFile.getName().startsWith(".")) {
                                 arrayList.add(
-                                        new SongsInfo(myFile.getName(),
+                                        new SongsInfo(myFile.getName().substring(0, myFile.getName().lastIndexOf(".")),
                                                 mediaMetaData.getSongArtist(myFile),
                                                 mediaMetaData.getSongAlbum(myFile),
                                                 mediaMetaData.getSongLength(myFile), myFile));
@@ -73,7 +73,7 @@ public class FetchFileData {
                         for (String ext : songExtensions) {
                             if (myFile.getName().endsWith(ext) && !myFile.getName().startsWith(".")) {
                                 arrayList.add(new SongsInfo(
-                                        myFile.getName(),
+                                        myFile.getName().substring(0, myFile.getName().lastIndexOf(".")),
                                         mediaMetaData.getSongArtist(myFile),
                                         mediaMetaData.getSongAlbum(myFile),
                                         mediaMetaData.getSongLength(myFile), myFile));

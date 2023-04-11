@@ -53,7 +53,7 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
 
         SongsInfo songsInfo = mData.get(position);
 
-        String nameOfSOng = songsInfo.getTitle();
+        String nameOfSOng = songsInfo.getTitle1();
 
         if (songsInfo.getPath().isDirectory()) {
             holder.myTextView.setText(nameOfSOng);
@@ -115,7 +115,7 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
 
     //get title first letter
     public String getTitle(int position) {
-        return getItem(position).getTitle().substring(0, 1);
+        return getItem(position).getTitle1().substring(0, 1);
     }
 
 

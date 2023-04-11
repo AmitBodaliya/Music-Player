@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,9 +24,15 @@ import android.widget.Toast;
 import com.abapp.soundplay.Helper.FetchFileData;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.Room.Songs.MyDatabaseSongs;
+import com.abapp.soundplay.Room.Songs.SongsRepository;
+import com.abapp.soundplay.params.Prefs;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
@@ -35,10 +40,16 @@ public class SplashActivity extends AppCompatActivity {
     TextView pleaseWait;
     private static final int PERMISSION_REQUEST_CODE = 101;
 
+    Prefs prefs;
+    SongsRepository songsRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        prefs = new Prefs(this);
+        songsRepository = new SongsRepository(MyDatabaseSongs.getDatabase(this));
 
         //please wait
         pleaseWait = findViewById(R.id.pleaseWait);
@@ -56,8 +67,36 @@ public class SplashActivity extends AppCompatActivity {
 
 
     public void postDelay(){
-        new getListAndStart().execute();
+        AtomicBoolean startActivity = new AtomicBoolean(false);
+
+        FetchFileData fetchFileData = new FetchFileData(this);
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            if (songsRepository.itemCount() == 0){
+
+                ArrayList<SongsInfo> arrayList =  new ArrayList<>(fetchFileData.fetchFile(Environment.getExternalStorageDirectory() , false , false , true));
+                songsRepository.insertAll(arrayList);
+
+                run = false;
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
+
+
+            }else{
+                startActivity.set(true);
+            }
+        });
+
+        new Handler().postDelayed(() -> {
+            if (startActivity.get()) {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
+            }
+        },1700);
+
     }
+
+
 
     private boolean checkPermission() {
 
@@ -90,41 +129,6 @@ public class SplashActivity extends AppCompatActivity {
 
 
 
-
-    @SuppressLint("StaticFieldLeak")
-    public class getListAndStart extends AsyncTask<Void, Void, ArrayList<SongsInfo>> {
-
-        FetchFileData fetchFileData;
-
-        @Override
-        protected void onPreExecute() {
-            fetchFileData = new FetchFileData(SplashActivity.this);
-            Log.d("TAG", "onPreExecute() called");
-            super.onPreExecute();
-        }
-
-
-        @Override
-        protected ArrayList<SongsInfo> doInBackground(Void... voids) {
-            // Perform your background task here
-
-            return new ArrayList<>(fetchFileData.fetchFile(Environment.getExternalStorageDirectory() , false , false , true));
-        }
-
-
-        @Override
-        protected void onPostExecute(ArrayList<SongsInfo> arrayList) {
-            Log.d("TAG", "onPostExecute() called with: arrayList = [" + arrayList.size() + "]");
-            super.onPostExecute(arrayList);
-
-            run = false;
-            Intent homeIntent = new Intent(SplashActivity.this, MainActivity.class);
-            homeIntent.putParcelableArrayListExtra("arrayList", arrayList);
-            startActivity(homeIntent);
-            finish();
-        }
-
-    }
 
     boolean run = true;
     @SuppressLint("SetTextI18n")

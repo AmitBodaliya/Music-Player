@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import com.abapp.soundplay.Activity.MainActivity;
 import com.abapp.soundplay.Adapter.RecyclerViewAdapter;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 
 import java.util.ArrayList;
 
@@ -27,13 +29,14 @@ public class FragmentSearch extends Fragment {
 
     Context context;
     EditText editTextSearch;
-    ArrayList<SongsInfo> arrayList;
+    ArrayList<SongsInfo> arrayList = new ArrayList<>();
 
 
     RecyclerView recyclerViewSearch;
     RecyclerViewAdapter adapter;
     ArrayList<SongsInfo> searchResultList;
 
+    LiveDataViewModel liveDataViewModel;
 
     public FragmentSearch() {
     }
@@ -44,7 +47,11 @@ public class FragmentSearch extends Fragment {
         v = inflater.inflate(R.layout.fragment_search, container, false);
 
         context = requireContext();
-        arrayList = ((MainActivity) requireContext()).getArrayList();
+
+
+        //get list
+        liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
+        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), list -> arrayList = list);
 
 
         editTextSearch = v.findViewById(R.id.editTextSearch);
@@ -100,7 +107,7 @@ public class FragmentSearch extends Fragment {
         searchResultList = new ArrayList<>();
 
         for (SongsInfo songsInfo : arrayList) {
-            if (searchText(songsInfo.getTitle(), searchStringText)) {
+            if (searchText(songsInfo.getTitle1(), searchStringText)) {
                 searchResultList.add(songsInfo);
             }
         }

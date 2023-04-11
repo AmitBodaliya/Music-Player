@@ -4,6 +4,8 @@ public class Action {
 
     public static final String CHANNEL_ID = "channel1";
 
+    public static final String ACTION_UPDATE_UI = "action_update_ui";
+
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_PLAY_PAUSE = "action_play_pause";
     public static final String ACTION_PLAY = "action_play";

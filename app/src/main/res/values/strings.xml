@@ -29,4 +29,5 @@
     <string name="all_songs">All Songs</string>
     <string name="history">History</string>
     <string name="Recent">Recent</string>
+    <string name="reload_songs">Reload Songs</string>
 </resources>

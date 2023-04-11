@@ -1,33 +1,29 @@
 package com.abapp.soundplay.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
+import android.os.IBinder;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -36,26 +32,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.abapp.soundplay.Gesture.OnSwipeGesture;
-import com.abapp.soundplay.Helper.FavSong;
 import com.abapp.soundplay.Helper.FetchFileData;
-import com.abapp.soundplay.Helper.HistorySong;
 import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
-import com.abapp.soundplay.Notification.CreateNotification;
-import com.abapp.soundplay.Receiver.Action;
-import com.abapp.soundplay.Receiver.OnClearFromRecentService;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.Room.Fav.FavRepository;
+import com.abapp.soundplay.Room.Fav.MyDatabaseFav;
+import com.abapp.soundplay.Room.History.HistoryRepository;
+import com.abapp.soundplay.Room.History.MyDatabaseHistory;
+import com.abapp.soundplay.Room.Songs.MyDatabaseSongs;
+import com.abapp.soundplay.Room.Songs.SongsRepository;
+import com.abapp.soundplay.Room.Songs.TableSongs;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
 import com.abapp.soundplay.ViewHalper.ShowListView;
 import com.abapp.soundplay.ViewHalper.SongInfoView;
+import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnTaskCompletionListener {
+public class MainActivity extends AppCompatActivity {
 
     //music payer view
     LinearLayout content_dock_master;
@@ -70,32 +69,51 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
     PlayerFullView playerFullView;
 
 
-    //music payer
-    MusicPlayer_1 musicPlayer_1;
-
     //Media Data
     MediaMetaData mediaMetaData;
-    MediaSessionCompat mediaSession;
 
     FetchFileData fetchFileData;
 
 
     //array list
     SongsInfo currentSong;
-    ArrayList<SongsInfo> upNextList = null;
-    ArrayList<SongsInfo> arrayListBackground = null;
+    ArrayList<SongsInfo> upNextList = new ArrayList<>();
 
 
     UniqueIdGen uniqueIdGen;
-    FavSong favSong;
-    HistorySong historySong;
 
-    //notification
-    NotificationManager notificationManager;
+    MyDatabaseSongs myDatabaseSongs;
+    SongsRepository songsRepository;
+
+    MyDatabaseFav myDatabaseFav;
+    FavRepository favRepository;
+
+    MyDatabaseHistory myDatabaseHistory;
+    HistoryRepository historyRepository;
+
+    LiveDataViewModel liveDataViewModel;
 
 
-    //focus change
-    boolean isFocusChangeByUser = false;
+
+    private MusicPlayer_1.MusicBinder musicBinder;
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            musicBinder = (MusicPlayer_1.MusicBinder) iBinder;
+
+            if (!musicBinder.isNull()) uiUpdate();
+
+            MediaControllerCompat mediaController = musicBinder.getMediaController();
+            MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            musicBinder = null;
+            MediaControllerCompat.setMediaController(MainActivity.this, null);
+        }
+    };
+
 
 
     @Override
@@ -112,145 +130,72 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         titleTextPlayer = findViewById(R.id.titleTextPlayer);
         playPausePlayer = findViewById(R.id.playPausePlayer);
 
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+
         content_dock_master.setVisibility(View.GONE);
 
 
         //set music player
-        musicPlayer_1 = new MusicPlayer_1(this);
-        musicPlayer_1.setOnTaskCompletionListener(this);
+        Intent musicIntent = new Intent(this, MusicPlayer_1.class);
+        startService(musicIntent);
+        bindService(musicIntent , serviceConnection, Context.BIND_AUTO_CREATE);
 
+        // Create an instance of the ViewModel
+        liveDataViewModel = new ViewModelProvider(this).get(LiveDataViewModel.class);
 
         uniqueIdGen = UniqueIdGen.getInstance();
-        favSong = new FavSong(this);
-        historySong = new HistorySong(this);
+
+        //database
+        myDatabaseSongs = MyDatabaseSongs.getDatabase(this);
+        songsRepository = new SongsRepository(myDatabaseSongs);
+
+        myDatabaseFav = MyDatabaseFav.getDatabase(this);
+        favRepository = new FavRepository(myDatabaseFav);
+
+        myDatabaseHistory = MyDatabaseHistory.getDatabase(this);
+        historyRepository = new HistoryRepository(myDatabaseHistory);
+
         mediaMetaData = new MediaMetaData(this);
         fetchFileData = new FetchFileData(this);
 
-
-        setMediaSession();
-        registerReceiver();
-
-
-        //set list and set view pager
-        Intent intent = getIntent();
-        Bundle extras = getIntent().getExtras();
+        //set default navigation view
+        setNavigationView();
 
 
-        if(extras == null){
-            Toast.makeText(this, "Something Went Wrong!", Toast.LENGTH_SHORT).show();
-        } else {
+        //get list live update
+        myDatabaseSongs.myDao().getAllEntities().observe(this, tableSongs -> {
+            ArrayList<SongsInfo> arrayList1 = new ArrayList<>();
+            for (TableSongs tableSongs1 : tableSongs) {
+                SongsInfo songsInfo = new SongsInfo(
+                        tableSongs1.SONGS_TITLE,
+                        tableSongs1.SONGS_ARTISTS,
+                        tableSongs1.SONGS_ALBUM,
+                        tableSongs1.SONGS_LENGTH,
+                        new File(tableSongs1.Song_Path));
+                arrayList1.add(songsInfo);
+            }
 
-            arrayListBackground = intent.getParcelableArrayListExtra("arrayList");
-            arrayListBackground.sort(SongsInfo.sortByTitle);
+            liveDataViewModel.setData(arrayList1);
+        });
 
-            //set bottom nav view
-            bottomNavigationView = findViewById(R.id.bottom_navigation);
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-            NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-            setDefaultNav();
-
-        }
+        //update ui broadcast
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
 
     }
 
-    public ArrayList<SongsInfo> getArrayList(){
-        return arrayListBackground;
+    public void setNavigationView(){
+        //set bottom nav view
+        NavigationUI.setupWithNavController(bottomNavigationView, Navigation.findNavController(this, R.id.nav_host_fragment_activity_main));
+
+        setDefaultNav();
     }
+
 
 
     public void setDefaultNav(){
         bottomNavigationView.setSelectedItemId(R.id.navigation_main);
-    }
-
-
-    public void setMediaSession(){
-
-        //media session
-//        ComponentName receiver = new ComponentName(getPackageName(), MediaButtonReceiver.class.getName());
-//        mediaSession = new MediaSessionCompat(this, "PlayerService", receiver, null);
-        mediaSession = new MediaSessionCompat(this, "PlayerService");
-
-        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
-        stateBuilder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY |
-                PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PLAY_PAUSE |
-                PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
-
-        mediaSession.setPlaybackState(stateBuilder.build());
-        mediaSession.setCallback(mediaSessionCallBack);
-
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.requestAudioFocus(focusChange -> {
-            Log.d("TAG", "onAudioFocusChange : " + focusChange);
-            if (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT == focusChange){
-                if (musicPlayer_1.isMusicPlaying()){
-                    isFocusChangeByUser = true;
-                    musicPlayer_1.pauseMusic();
-                }
-            }else if (AudioManager.AUDIOFOCUS_GAIN == focusChange){
-                if (isFocusChangeByUser){
-                    isFocusChangeByUser = false;
-                    musicPlayer_1.startMusic();
-                }
-            }
-        }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
-
-        mediaSession.setActive(true);
-    }
-
-
-    public void registerReceiver(){
-        //notificationReceiver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            createChannel();
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
-            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-        }
-
-    }
-
-
-    //menu/////////////////////////////////////////////////////////////////////////////////////////////
-    public void MainMenu(View view){
-        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenu );
-        PopupMenu popup = new PopupMenu(wrapper, view ,  Gravity.END);
-        popup.getMenuInflater().inflate(R.menu.popup_menu_main , popup.getMenu());
-
-        popup.setOnMenuItemClickListener(item -> {
-
-            //refresh list
-            if (item.getItemId() == R.id.refreshList) {
-                startActivity(new Intent(this, SplashActivity.class));
-                finish();
-                return true;
-            }
-
-            //play
-            if (item.getItemId() == R.id.itemBothPlay) {
-                return true;
-            }
-
-
-            if (item.getItemId() == R.id.idFavourite) {
-                showAllFavSOng();
-                return true;
-            }
-
-            if (item.getItemId() == R.id.item_setting) {
-                startActivity(new Intent(this, SettingActivity.class));
-                return true;
-            }
-
-            if (item.getItemId() == R.id.item_main_about) {
-                startActivity(new Intent(this, AboutActivity.class));
-                return true;
-            }
-
-            return super.onOptionsItemSelected(item);
-
-        });
-        popup.show();
     }
 
 
@@ -261,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
         SongsInfo temp = new SongsInfo();
         temp.setUniqueID(uniqueIdGen.generateUniqueId());
-        temp.setTitle(songsInfo.getTitle());
+        temp.setTitle(songsInfo.getTitle1());
         temp.setArtist(songsInfo.getArtist());
         temp.setAlbum(songsInfo.getAlbum());
         temp.setPath(songsInfo.getPath());
@@ -303,7 +248,8 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
                 //add to favourite song
                 case R.id.item5:
-                    favSong.addToFavourite(songsInfo);
+                    favRepository.insert(songsInfo);
+
                     Toast.makeText(this, "Added to Favourite", Toast.LENGTH_SHORT).show();
                     return true;
 
@@ -367,8 +313,8 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
     //show full screen view
     public void openPlayingSong() {
-        if (!musicPlayer_1.isNull()) {
-            playerFullView = new PlayerFullView(this, this, musicPlayer_1, upNextList);
+        if (!musicBinder.isNull()) {
+            playerFullView = new PlayerFullView(this, this, musicBinder, upNextList);
             playerFullView.showDialog();
         }
     }
@@ -385,30 +331,30 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         new ShowListView(this , this, "" + title , list);
     }
 
-    public void showAllFavSOng() {
-        if (favSong.isListEmpty())
-            Toast.makeText(this, "No Favourite Song", Toast.LENGTH_SHORT).show();
-        else new ShowListView(this , this, "Favourite Songs" , favSong.getAllFavouriteSOng());
+
+    public void showAllFavSOng(ArrayList<SongsInfo> arrayList) {
+        if (arrayList.isEmpty())
+            Toast.makeText(MainActivity.this, "No Favourite Song", Toast.LENGTH_SHORT).show();
+        else {
+            new ShowListView(MainActivity.this, MainActivity.this, "Favourite Songs", arrayList);
+        }
     }
 
 
-    public void showHistory() {
-        if (favSong.isListEmpty())
-            Toast.makeText(this, "No History", Toast.LENGTH_SHORT).show();
-        else new ShowListView(this , this, "History" , historySong.getAllHistory());
+    public void showHistory(ArrayList<SongsInfo> arrayList) {
+        if (arrayList.isEmpty())
+            Toast.makeText(MainActivity.this, "No Recent Song", Toast.LENGTH_SHORT).show();
+        else {
+            new ShowListView(MainActivity.this, MainActivity.this, "Recent", arrayList);
+        }
     }
-
-
-
-
-
-
-
 
 
 
     //on click
-    public void onItemClick(View view , SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+    public void onItemClick(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+        v.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale));
+
         ArrayList<SongsInfo> finalLIst = new ArrayList<>();
         for (SongsInfo songINfo: arrayList) {
             songINfo.setUniqueID(uniqueIdGen.generateUniqueId());
@@ -418,94 +364,45 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         currentSong = finalLIst.get(position);
         upNextList = finalLIst;
 
-        musicPlayer_1.setMusicAndStart(songsInfo);
+        musicBinder.playMedia(songsInfo, arrayList);
+
 
         if (playerFullView != null) playerFullView.dismissDialog();
 
-        playerFullView = new PlayerFullView(this, this, musicPlayer_1, upNextList);
-//        playerFullView.showDialog();
-
-
-
-        //set media session queue
-//        int id = 1;
-//        List<MediaSessionCompat.QueueItem> queueItemS = new ArrayList<>();
-//
-//        for (SongsInfo songsInfo1: arrayList){
-//            MediaDescriptionCompat mediaDescription = new MediaDescriptionCompat.Builder()
-//                    .setTitle("" + songsInfo1.getTitle())
-//                    .setSubtitle("" + songsInfo1.getArtist())
-//                    .setIconBitmap(songsInfo1.getBitmapImage())
-//                    .setMediaUri(Uri.fromFile(songsInfo1.getPath()))
-//                    .build();
-//
-//            queueItemS.add(new MediaSessionCompat.QueueItem(mediaDescription , id++));
-//        }
-//        mediaSession.setQueue(queueItemS);
-
+        playerFullView = new PlayerFullView(this, this, musicBinder, upNextList);
+        playerFullView.showDialog();
 
     }
 
 
 
-    //music player functions
-
-    @Override
-    public void onMusicComplete(MediaPlayer mediaPlayer) {
-        nextSong();
-    }
-
-    @Override
-    public void onMusicSet(MediaPlayer mediaPlayer, SongsInfo songsInfo) {
-        historySong.addToHistory(songsInfo);
-    }
-
-
-    @Override
-    public void onMusicChange(MediaPlayer mediaPlayer, SongsInfo songsInfo) {
-        changeView(songsInfo);
-
-        int position = 0;
-        for (int i = 0; i < upNextList.size(); i++) {
-            if (songsInfo.getUniqueID().equals(upNextList.get(i).getUniqueID())){
-                position = i;
-                break;
-            }
+    BroadcastReceiver broadcastReceiverUpdateUi = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            uiUpdate();
         }
-
-        if (musicPlayer_1.isMusicPlaying()){
-            CreateNotification.createNotification(MainActivity.this, songsInfo,
-                    R.drawable.baseline_pause_black_24, position, upNextList.size() - 1);
-        }else {
-            CreateNotification.createNotification(MainActivity.this, songsInfo,
-                    R.drawable.baseline_play_arrow_black_24, position, upNextList.size() - 1);
-        }
-
-
-        MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "" + songsInfo.getTitle())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "" + songsInfo.getArtist())
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "" + songsInfo.getAlbum())
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, songsInfo.getBitmapImage())
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musicPlayer_1.getDuration());
-
-        mediaSession.setMetadata(metadataBuilder.build());
-
-
-
-        if (musicPlayer_1.isMusicPlaying()){
-            mediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 0.0f)
-                    .setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE).build());
-        }else {
-            mediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                    .setState(PlaybackStateCompat.STATE_PAUSED, 0, 1.0f)
-                    .setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE).build());
-        }
-    }
+    };
 
     @SuppressLint("ClickableViewAccessibility")
-    public void changeView(SongsInfo songsInfo){
+    public void uiUpdate(){
+        if (musicBinder == null) return;
+
+        SongsInfo songsInfo = musicBinder.getCurrentSongInfo();
+        upNextList = musicBinder.getAllSong();
+
+        if (songsInfo == null || upNextList == null) return;
+
+
+        if (playerFullView == null) {
+            playerFullView = new PlayerFullView(this, this, musicBinder, upNextList);
+        }
+        else {
+            playerFullView.updateData(musicBinder);
+            playerFullView.updateUpNextList(upNextList);
+            playerFullView.refreshView(false);
+        }
+
+
         content_dock_master.setVisibility(View.VISIBLE);
         content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
             @Override
@@ -530,30 +427,30 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
         //on play pause click
         playPausePlayer.setOnClickListener(v -> {
-            if (musicPlayer_1.isMusicPlaying()) {
-                musicPlayer_1.pauseMusic();
+            if (musicBinder.isMusicPlaying()) {
+                musicBinder.pauseMusic();
                 playPausePlayer.setImageResource(R.drawable.play_drawable);
             } else {
-                musicPlayer_1.startMusic();
+                musicBinder.playMusic();
                 playPausePlayer.setImageResource(R.drawable.baseline_pause_24);
             }
         });
 
 
         //set title
-        titleTextPlayer.setText(songsInfo.getTitle().substring(0, songsInfo.getTitle().lastIndexOf(".")));
+        titleTextPlayer.setText(songsInfo.getTitle1());
 
         //set play pause
-        playPausePlayer.setImageResource((musicPlayer_1.isMusicPlaying())? R.drawable.baseline_pause_24 : R.drawable.play_drawable);
+        playPausePlayer.setImageResource((musicBinder.isMusicPlaying())? R.drawable.baseline_pause_24 : R.drawable.play_drawable);
 
 
 //        set seek Bar
-        seekBarPlayer.setMax(musicPlayer_1.getDuration());
+        seekBarPlayer.setMax(musicBinder.getDuration());
         seekBarPlayer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    musicPlayer_1.setSeekTo(progress);
+                    musicBinder.setSeekTo(progress);
                 }
             }
 
@@ -573,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
         Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
-                int mCurrentPosition = musicPlayer_1.getCurrentPosition();
+                int mCurrentPosition = musicBinder.getCurrentPosition();
                 seekBarPlayer.setProgress(mCurrentPosition);
                 mHandler.postDelayed(this, 1000);
             }
@@ -585,187 +482,17 @@ public class MainActivity extends AppCompatActivity implements MusicPlayer_1.OnT
 
 
 
-    public void nextSong(){
-        for (int i = 0; i < upNextList.size(); i++) {
-            if (upNextList.get(i).getUniqueID().equals(currentSong.getUniqueID())){
-                if (i < upNextList.size() - 1) {
-                    currentSong = upNextList.get(i + 1);
-
-                    musicPlayer_1.stopMusic();
-                    musicPlayer_1.setMusicAndStart(currentSong);
-
-                    playerFullView.updateData(musicPlayer_1, currentSong);
-                    playerFullView.updateUpNextList(upNextList);
-                    playerFullView.refreshView(false);
-                }else changeView(currentSong);
-                break;
-            }
-        }
-    }
-
-    public void previousSong(){
-        for (int i = 0; i < upNextList.size(); i++) {
-            if (upNextList.get(i).getUniqueID().equals(currentSong.getUniqueID())){
-                if (i > 0) {
-                    currentSong = upNextList.get(i - 1);
-
-                    musicPlayer_1.stopMusic();
-                    musicPlayer_1.setMusicAndStart(currentSong);
-
-                    playerFullView.updateData(musicPlayer_1, currentSong);
-                    playerFullView.updateUpNextList(upNextList);
-                    playerFullView.refreshView(false);
-                }
-                break;
-            }
-        }
-    }
-
-
-
-    private void createChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(Action.CHANNEL_ID,
-                    "" + getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW);
-
-            notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null){
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-    }
-
-
-
-    BroadcastReceiver mHeadsetReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-                    Log.i("TAG", "onReceive: STATE_DISCONNECTED" + action);
-
-            if (action.equals(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)) {
-                int state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, BluetoothHeadset.STATE_DISCONNECTED);
-
-                if (state == BluetoothHeadset.STATE_DISCONNECTED) {
-                    Log.i("TAG", "onReceive: STATE_DISCONNECTED");
-                    // Bluetooth headset is disconnected, pause playback
-                    // Pause your music playback here
-                }
-            }
-        }
-    };
-
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("TAG", "onReceive() called with: context = [" + context + "], intent = [" + intent + "]");
-            String action = intent.getExtras().getString("action_name");
-
-            switch (action){
-                case Action.ACTION_PREVIOUS:
-                    previousSong();
-                    break;
-                case Action.ACTION_PLAY_PAUSE:
-                    if (musicPlayer_1.isMusicPlaying()){
-                        musicPlayer_1.pauseMusic();
-                    }else musicPlayer_1.startMusic();
-                    break;
-                case Action.ACTION_NEXT:
-                    nextSong();
-                    break;
-                case Action.ACTION_PLAY:
-                    musicPlayer_1.startMusic();
-                    break;
-                case Action.ACTION_PAUSE:
-                    musicPlayer_1.pauseMusic();
-                    break;
-            }
-        }
-    };
-
-
-    MediaSessionCompat.Callback mediaSessionCallBack = new MediaSessionCompat.Callback(){
-        @Override
-        public void onPlay() {
-            Log.d("TAG", "onPlay(a) called");
-            musicPlayer_1.startMusic();
-        }
-
-        @Override
-        public void onPause() {
-            Log.d("TAG", "onPause(a) called");
-            musicPlayer_1.pauseMusic();
-        }
-
-        @Override
-        public void onSkipToNext() {
-            Log.d("TAG", "onSkipToNext(a) called");
-            nextSong();
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            Log.d("TAG", "onSkipToPrevious(a) called");
-            previousSong();
-        }
-
-
-        @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            String intentAction = mediaButtonEvent.getAction();
-
-            if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)){
-                KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-
-                int action = event.getAction();
-                if (action == KeyEvent.ACTION_DOWN) {
-                    switch (event.getKeyCode()) {
-                        // Do what you want in here
-                        case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                            if (musicPlayer_1.isMusicPlaying()){
-                                musicPlayer_1.pauseMusic();
-                            }else musicPlayer_1.startMusic();
-                            break;
-                        case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                            musicPlayer_1.pauseMusic();
-                            break;
-                        case KeyEvent.KEYCODE_MEDIA_PLAY:
-                            musicPlayer_1.startMusic();
-                            break;
-                        case KeyEvent.KEYCODE_MEDIA_NEXT:
-                            nextSong();
-                            break;
-                        case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                            previousSong();
-                            break;
-                    }
-                    return true;
-                }
-            }
-            return super.onMediaButtonEvent(mediaButtonEvent);
-        }
-    };
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            notificationManager.cancelAll();
-        }
-
-        musicPlayer_1.destroyPlayer();
-
-
-        unregisterReceiver(broadcastReceiver);
-//        unregisterReceiver(mHeadsetReceiver);
-        mediaSession.release();
-
+        unbindService(serviceConnection);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiverUpdateUi);
     }
 
     @Override
     public void onBackPressed() {
         setDefaultNav();
     }
+
+
 }

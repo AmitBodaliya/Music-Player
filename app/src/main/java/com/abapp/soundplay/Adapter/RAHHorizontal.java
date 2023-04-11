@@ -51,7 +51,7 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
 
         SongsInfo songsInfo = mData.get(position);
 
-        String nameOfSOng = songsInfo.getTitle();
+        String nameOfSOng = songsInfo.getTitle1();
         nameOfSOng = nameOfSOng.lastIndexOf(".") > 0 ? nameOfSOng.substring(0, nameOfSOng.lastIndexOf(".")) : nameOfSOng;
 
         holder.myTextView.setText(nameOfSOng);
@@ -76,7 +76,7 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
 
     //get title first letter
     public String getTitle(int position) {
-        return getItem(position).getTitle().substring(0, 1);
+        return getItem(position).getTitle1().substring(0, 1);
     }
 
 

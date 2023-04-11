@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
 import java.io.File;
 import java.util.Comparator;
 
@@ -23,8 +24,8 @@ public class SongsInfo implements Parcelable {
 
 
     //this is for dir
-    public SongsInfo(String name, File myFile) {
-        this.title = name;
+    public SongsInfo(String title, File myFile) {
+        this.title = title;
         this.path = myFile.toString();
     }
 
@@ -97,7 +98,7 @@ public class SongsInfo implements Parcelable {
         this.uniqueID = uniqueID;
     }
 
-    public String getTitle() {
+    public String getTitle1() {
         return title;
     }
     public String getAlbum() {
@@ -109,6 +110,7 @@ public class SongsInfo implements Parcelable {
     public Bitmap getBitmapImage() {
         return bitmapImage;
     }
+
     public File getPath() {
         return new File(path);
     }
@@ -139,11 +141,12 @@ public class SongsInfo implements Parcelable {
 
     public static Comparator<SongsInfo> sortByTitle = (songsInfo, appInfo2) -> {
 
-        String app1 = songsInfo.getTitle().toUpperCase();
-        String app2 = appInfo2.getTitle().toUpperCase();
+        String app1 = songsInfo.getTitle1().toUpperCase();
+        String app2 = appInfo2.getTitle1().toUpperCase();
 
         return app1.compareTo(app2);
     };
+
 
 
 
