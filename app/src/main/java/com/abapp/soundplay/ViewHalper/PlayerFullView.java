@@ -17,6 +17,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,14 +25,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.abapp.soundplay.Activity.MainActivity;
 import com.abapp.soundplay.Adapter.ItemMoveCallback;
 import com.abapp.soundplay.Adapter.RVAUpNext;
-import com.abapp.soundplay.Gesture.OnSwipeGesture;
 import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.Room.Fav.FavRepository;
 import com.abapp.soundplay.Room.Fav.MyDatabaseFav;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -54,14 +53,15 @@ public class PlayerFullView {
 
 
     //ints
-    SlidingUpPanelLayout slidingPaneLayout;
+    MotionLayout motionLayout;
+    LinearLayout expandUpNextList;
+
     ImageView songInfoScreen;
     ImageView imageViewF;
     ImageView cancelFullScreenAlert;
     ImageView albumArtFullScreenAlert, playPauseFullScreenAlert, nextFullScreenAlert, previousFullScreenAlert;
     TextView titleTextFullScreenAlert, timeDuringFullScreenAlert, titleArtistFullScreenAlert, timeCurrentFullScreenAlert;
     SeekBar seekBarArtScreenFullScreenAlert;
-    LinearLayout upNextListLayoutFullScreenAlert;
 
 
     //current song.
@@ -120,6 +120,9 @@ public class PlayerFullView {
 
 
 //        ints
+        motionLayout = mView.findViewById(R.id.motionLayout);
+        expandUpNextList = mView.findViewById(R.id.background);
+
         songInfoScreen = mView.findViewById(R.id.songInfoScreen);
         imageViewF = mView.findViewById(R.id.favouriteScreen);
         cancelFullScreenAlert = mView.findViewById(R.id.cancelScreen);
@@ -135,7 +138,6 @@ public class PlayerFullView {
 
         subTitleUpNext = mView.findViewById(R.id.subTitleUpNextList);
         recyclerViewUpNextList = mView.findViewById(R.id.upNextListRecyclerView);
-        upNextListLayoutFullScreenAlert = mView.findViewById(R.id.upNextLayout);
 
 
         alert.setView(mView);
@@ -148,58 +150,9 @@ public class PlayerFullView {
         }
 
 
-        //on slide down in the view
-        mView.setOnTouchListener(new OnSwipeGesture(context) {
-            @Override
-            public void onSwipeBottom() {
-                alertDialog.dismiss();
-            }
-        });
+        //on click expand to end
+        expandUpNextList.setOnClickListener(view -> motionLayout.transitionToEnd());
 
-
-        upNextListLayoutFullScreenAlert.setOnTouchListener(new OnSwipeGesture(context) {
-            @Override
-            public void onClick() {
-                slidingPaneLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-            }
-
-            @Override
-            public void onSwipeTop() {
-            }
-        });
-
-
-        //set up next list visibility
-        if (djMode) {
-            upNextListLayoutFullScreenAlert.setVisibility(View.GONE);
-        } else {
-            upNextListLayoutFullScreenAlert.setVisibility(View.VISIBLE);
-        }
-
-
-        //implement slide
-        slidingPaneLayout = mView.findViewById(R.id.slidePanelLayout);
-        if (!djMode) {
-            slidingPaneLayout.setPanelHeight(170);
-            slidingPaneLayout.setShadowHeight(0);
-            slidingPaneLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-                @Override
-                public void onPanelSlide(View panel, float slideOffset) {
-                    mView.findViewById(R.id.bottomUpLayoutSlidePanel).setAlpha(slideOffset);
-                    mView.findViewById(R.id.bottomBottomUpLayoutSlidePanel).setAlpha(1 - slideOffset);
-                }
-
-                @Override
-                public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-
-                }
-            });
-            mView.findViewById(R.id.bottomUpLayoutSlidePanel).setAlpha(0);
-            mView.findViewById(R.id.bottomBottomUpLayoutSlidePanel).setAlpha(1);
-        } else slidingPaneLayout.setPanelHeight(0);
-
-
-        slidingPaneLayout.setScrollableView(recyclerViewUpNextList);
 
 
         //ready list show in recycler view view

@@ -404,17 +404,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         content_dock_master.setVisibility(View.VISIBLE);
-        content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
-            @Override
-            public void onClick() {
-                openPlayingSong();
-            }
-
-            @Override
-            public void onSwipeTop() {
-                openPlayingSong();
-            }
-        });
+//        content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
+//            @Override
+//            public void onClick() {
+//                openPlayingSong();
+//            }
+//
+//            @Override
+//            public void onSwipeTop() {
+//                openPlayingSong();
+//            }
+//        });
 
 
         //set album art

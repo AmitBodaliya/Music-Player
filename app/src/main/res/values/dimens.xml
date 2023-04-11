@@ -17,5 +17,6 @@
     <dimen name="layout_marginVertical">7dp</dimen>
 
 
+    <dimen name="upNextListLayoutHeight">80dp</dimen>
 
 </resources>
