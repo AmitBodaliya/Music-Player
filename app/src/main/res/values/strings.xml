@@ -30,4 +30,12 @@
     <string name="history">History</string>
     <string name="Recent">Recent</string>
     <string name="reload_songs">Reload Songs</string>
+    <string name="no_data">No Data</string>
+    <string name="album">Album</string>
+    <string name="artist">Artist</string>
+    <string name="titile">Titile</string>
+    <string name="theme_color">Theme Color</string>
+    <string name="refresh_list_in_splash">Refresh List in Splash</string>
+    <string name="direct_play">Direct Play</string>
+    <string name="no_result">No Result</string>
 </resources>

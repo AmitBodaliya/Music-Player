@@ -21,6 +21,8 @@ import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FragmentAlbum extends Fragment {
 
@@ -35,6 +37,9 @@ public class FragmentAlbum extends Fragment {
     }
 
 
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_album, container, false);
@@ -45,40 +50,14 @@ public class FragmentAlbum extends Fragment {
 
         //get list
         liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
-        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), this::extractAlbumList);
+        liveDataViewModel.albumLivaData.observe(getViewLifecycleOwner(), this::setList);
 
         return v;
     }
 
-    public void extractAlbumList(ArrayList<SongsInfo> arrayList){
-        Log.d("TAG", "extractAlbumList() called with: arrayList = [" + arrayList.size() + "]");
-        ArrayList<AlbumInfo> albumList = new ArrayList<>();
 
-        for(SongsInfo songsInfo : arrayList){
 
-            boolean b = true;
 
-            for(AlbumInfo albumInfo : albumList){
-                if (albumInfo.getTitle().equals(songsInfo.getAlbum())) {
-                    b = false;
-                    break;
-                }
-            }
-            if(b) {
-                ArrayList<SongsInfo> test1 = new ArrayList<>();
-                albumList.add(new AlbumInfo(songsInfo.getAlbum() , test1));
-            }
-
-            for (int i = 0; i < albumList.size() ; i++){
-                if(songsInfo.getAlbum().equals(albumList.get(i).getTitle())){
-                    albumList.get(i).addItem(songsInfo);
-                }
-            }
-        }
-
-        setList(albumList );
-
-    }
 
     public void setList(ArrayList<AlbumInfo> albumList ){
         albumList.sort(AlbumInfo.AppNameComparator);
@@ -88,10 +67,13 @@ public class FragmentAlbum extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(context, 3 ));
         recyclerView.setAdapter(adapter);
 
+
+
+
         adapter.setClickListener(new RVAAlbumArtists.ItemClickListener() {
             @Override
             public void onItemClick(String artistName , int position, ArrayList<SongsInfo> list) {
-                ((MainActivity) requireActivity()).showSongListDialog("" + albumList.get(position).getTitle() , list);
+                ((MainActivity) requireActivity()).showSongListDialog(albumList.get(position).getTitle(), list);
             }
 
             @Override

@@ -57,6 +57,7 @@ public class MediaMetaData {
         mediaMetadata.setDataSource(String.valueOf(uri));
         try {
             byte[] art = mediaMetadata.getEmbeddedPicture();
+            assert art != null;
             return BitmapFactory.decodeByteArray(art, 0, art.length);
         } catch (Exception e) {
             return null;
@@ -72,16 +73,13 @@ public class MediaMetaData {
         mediaMetadataRetriever.setDataSource(path.toString());
         String during = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 
-        Long dur = Long.parseLong(during);
+        assert during != null;
+        long dur = Long.parseLong(during);
 
         String Sec = String.valueOf((dur % 60000) / 1000);
         String min = String.valueOf(dur / 60000);
 
-        if (Sec.length() == 1) {
-            return min + ":0" + Sec;
-        } else {
-            return min + ":" + Sec;
-        }
+        return (Sec.length() == 1)? min + ":0" + Sec :  min + ":" + Sec;
     }
 
 }

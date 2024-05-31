@@ -2,6 +2,7 @@
 <androidx.constraintlayout.motion.widget.MotionLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/motionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,15 +12,17 @@
         android:id="@+id/music_controller_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/swipeLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:orientation="vertical"
-            android:layout_marginBottom="@dimen/upNextListLayoutHeight">
+            android:layout_marginBottom="@dimen/upNextListLayoutHeight"
+            tools:ignore="UselessParent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -174,7 +177,8 @@
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1" />
+                                android:layout_weight="1"
+                                android:background="@null"/>
 
                             <TextView
                                 android:id="@+id/timeDuringScreen"
@@ -234,7 +238,7 @@
                             <androidx.cardview.widget.CardView
                                 android:layout_width="70dp"
                                 android:layout_height="70dp"
-                                android:backgroundTint="@color/colorAccent"
+                                android:backgroundTint="?attr/colorAccent"
                                 app:cardCornerRadius="70dp"
                                 app:cardElevation="2dp">
 
@@ -245,7 +249,8 @@
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/todo"
                                     android:padding="14dp"
-                                    app:srcCompat="@drawable/play_drawable" />
+                                    app:srcCompat="@drawable/play_drawable"
+                                    app:tint="@color/white" />
 
                             </androidx.cardview.widget.CardView>
 
@@ -343,6 +348,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/imageViewShowList"
                 android:layout_width="50dp"
                 android:layout_height="40dp"
                 android:layout_weight="0"
@@ -360,7 +366,7 @@
             android:background="@color/divider_color"/>
 
         <LinearLayout
-            android:background="@color/colorPrimary"
+            android:background="?attr/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">

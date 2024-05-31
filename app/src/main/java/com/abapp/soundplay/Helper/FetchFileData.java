@@ -4,6 +4,7 @@ import android.content.Context;
 
 
 import com.abapp.soundplay.Model.SongsInfo;
+import com.abapp.soundplay.params.HardCoreData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ public class FetchFileData {
     Context context;
     MediaMetaData mediaMetaData;
 
-    public String[] songExtensions = {".mp3" , ".WAV" , ".AAC" , ".WMA"};
 
 
     public FetchFileData(Context context) {
@@ -22,74 +22,62 @@ public class FetchFileData {
     }
 
 
-    // getting all the dir from given location
-    public ArrayList<SongsInfo> fetchFile(File file, Boolean song, Boolean dir, Boolean all) {
-
+    public ArrayList<SongsInfo> fetchFile(File file, boolean song, boolean dir, boolean all) {
         ArrayList<SongsInfo> arrayList = new ArrayList<>();
-        File[] songs = file.listFiles();
+        File[] files = file.listFiles();
 
+        if (files != null) {
 
-        if (dir) {
-            if (songs != null) {
-                for (File myFile : songs) {
-                    if (!myFile.isHidden() && myFile.isDirectory()) {
+            for (File myFile : files) {
+
+                if (!myFile.isHidden()) {
+                    if (dir && myFile.isDirectory()) {
                         arrayList.add(new SongsInfo(myFile.getName(), myFile));
                     }
-                }
-            }
-            arrayList.sort(SongsInfo.sortByTitle);
-        }
 
-
-        if (song) {
-            if (songs != null) {
-                for (File myFile : songs) {
-                    if (!myFile.isHidden() && !myFile.isDirectory()) {
-
-                        for (String ext : songExtensions) {
+                    else if (song && !myFile.isDirectory()) {
+                        for (String ext : HardCoreData.songExtensions) {
                             if (myFile.getName().endsWith(ext) && !myFile.getName().startsWith(".")) {
-                                arrayList.add(
-                                        new SongsInfo(myFile.getName().substring(0, myFile.getName().lastIndexOf(".")),
-                                                mediaMetaData.getSongArtist(myFile),
-                                                mediaMetaData.getSongAlbum(myFile),
-                                                mediaMetaData.getSongLength(myFile), myFile));
+                                arrayList.add(createSongInfo(myFile));
+                                break;
+                            }
+                        }
+                    }
 
+                    else if (all) {
+                        if (myFile.isDirectory()) {
+                            arrayList.addAll(fetchFile(myFile, false, false, true));
+                        }
+                        else {
+                            for (String ext : HardCoreData.songExtensions) {
+                                if (myFile.getName().endsWith(ext) && !myFile.getName().startsWith(".")) {
+                                    arrayList.add(createSongInfo(myFile));
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
-
-            arrayList.sort(SongsInfo.sortByTitle);
-
-        } else if (all) {
-            if (songs != null) {
-                for (File myFile : songs) {
-
-                    if (!myFile.isHidden() && myFile.isDirectory()) {
-                        arrayList.addAll(fetchFile((myFile), false, false, true));
-                    } else {
-
-                        for (String ext : songExtensions) {
-                            if (myFile.getName().endsWith(ext) && !myFile.getName().startsWith(".")) {
-                                arrayList.add(new SongsInfo(
-                                        myFile.getName().substring(0, myFile.getName().lastIndexOf(".")),
-                                        mediaMetaData.getSongArtist(myFile),
-                                        mediaMetaData.getSongAlbum(myFile),
-                                        mediaMetaData.getSongLength(myFile), myFile));
-
-                            }
-                        }
-
-                    }
-                }
-
-            }
-
-            arrayList.sort(SongsInfo.sortByTitle);
         }
 
+        arrayList.sort(SongsInfo.sortByTitle);
         return arrayList;
     }
+
+
+    private SongsInfo createSongInfo(File file) {
+        return new SongsInfo(
+                file.getName().substring(0, file.getName().lastIndexOf(".")),
+                mediaMetaData.getSongArtist(file),
+                mediaMetaData.getSongAlbum(file),
+                mediaMetaData.getSongLength(file),
+                file
+        );
+    }
+
+
+
+
 
 }

@@ -78,18 +78,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
             //set artist
-            if (songsInfo.getArtist().equals("")) holder.playerArtist.setText("<unknown>");
+            if (songsInfo.getArtist().isEmpty()) holder.playerArtist.setText("<unknown>");
             else holder.playerArtist.setText(songsInfo.getArtist());
 
 
             //set duration
-            if (!songsInfo.getSongLength().equals("")) holder.playerSongLength.setText(songsInfo.getSongLength());
+            if (!songsInfo.getSongLength().isEmpty()) holder.playerSongLength.setText(songsInfo.getSongLength());
 
         }
 
 
         holder.itemView.setOnClickListener(v -> {
             if (mClickListener != null) mClickListener.onItemClick(v, songsInfo, position, mData);
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (mClickListener != null) mClickListener.onItemLongClick(v, songsInfo, position, mData);
+            return true;
         });
 
         holder.menuImage.setOnClickListener(v -> {
@@ -144,7 +149,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
-
+        void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
         void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
     }
 }

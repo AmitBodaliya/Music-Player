@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class UniqueIdGen {
     private static UniqueIdGen instance;
-    private Set<String> usedIds;
+    private final Set<String> usedIds;
 
     private UniqueIdGen() {
         usedIds = new HashSet<>();

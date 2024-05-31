@@ -20,6 +20,7 @@ public interface HistoryDao {
 
     @Query("SELECT EXISTS(SELECT * FROM table_history WHERE Song_Path = :id)")
     boolean itExists(int id);
+
     @Query("SELECT * FROM table_history")
     List<TableHistory> getAllEntitiesN();
 

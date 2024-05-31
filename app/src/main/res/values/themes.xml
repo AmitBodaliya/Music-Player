@@ -8,7 +8,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccent1</item>
 
         <!--  Secondary brand color.  -->
         <item name="colorSecondary">@color/colorPrimary</item>
@@ -22,8 +22,9 @@
         <item name="android:windowLightStatusBar" tools:targetApi="27">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
         <item name="android:statusBarColor">@color/colorSecondary</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorSecondary</item>
     </style>
+
 
 
     //alert dialog style
@@ -32,22 +33,8 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
-        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
         <item name="android:navigationBarColor">@color/colorSecondary</item>
-        <item name="android:windowIsFloating">false</item>
-        //change button text color
-    </style>
-
-    //alert dialog style
-    <style name="FullScreenAlertDialogStyle2" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorSecondary</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:windowIsFloating">false</item>
         //change button text color
@@ -55,15 +42,40 @@
 
 
 
+    //alert dialog style
+    <style name="FullScreenAlertDialogStyle2" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:windowIsFloating">true</item>
+        //change button text color
+    </style>
+
+
+
     <style name="BottomSheetDialogStyle" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:colorBackground">@color/black</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/colorControlNormal</item>
-        <item name="android:textColor">@color/colorControlNormal</item>
+        <item name="android:navigationBarColor">@color/colorSecondary</item>
+        <item name="colorControlNormal">@color/textColor</item>
+        <item name="colorAccent">@color/colorAccent1</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
+
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
+
+
+    <style name="bottomSheetStyleWrapper" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 
     <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="elevation">@dimen/cardElevation</item>
@@ -87,8 +99,8 @@
         <item name="tabIndicatorGravity">bottom</item>
         <item name="tabBackground">@null</item>
         <item name="tabMode">auto</item>
-        <item name="tabIndicatorColor">@color/colorAccent</item>
-        <item name="tabSelectedTextColor">@color/colorAccent</item>
+        <item name="tabIndicatorColor">?attr/colorAccent</item>
+        <item name="tabSelectedTextColor">?attr/colorAccent</item>
         <item name="tabTextAppearance">@style/My.TabText.Style</item>
     </style>
 
@@ -111,5 +123,75 @@
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom</item>
     </style>
+
+
+
+
+    <style name="AppTheme.CustomAccent1" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent1</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent2" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent2</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent3" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent3</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent4" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent4</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent5" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent5</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent6" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent6</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent7" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent7</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent8" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent8</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent9" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent9</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent10" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent10</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent11" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent11</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent12" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent12</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent13" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent13</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent14" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent14</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent15" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent15</item>
+    </style>
+
+    <style name="AppTheme.CustomAccent16" parent="Theme.SoundApp">
+        <item name="colorAccent">@color/colorAccent16</item>
+    </style>
+
+
+
 
 </resources>

@@ -44,41 +44,14 @@ public class FragmentArtists extends Fragment {
 
         //get list
         liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
-        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), this::extractArtisList);
+        liveDataViewModel.artistLivaData.observe(getViewLifecycleOwner(), this::setList);
 
         return v;
     }
 
-    public void extractArtisList(ArrayList<SongsInfo> arrayList){
-        Log.d("TAG", "extractArtisList() called with: arrayList = [" + arrayList.size() + "]");
-        ArrayList<AlbumInfo> artistList = new ArrayList<>();
 
-        for(SongsInfo songsInfo : arrayList){
 
-            boolean b = true;
-            for(AlbumInfo albumInfo : artistList){
-                if(albumInfo.getTitle().equals(songsInfo.getArtist())){
-                    b = false;
-                    break;
-                }
-            }
-            if(b) {
-                ArrayList<SongsInfo> test1 = new ArrayList<>();
-                artistList.add(new AlbumInfo(songsInfo.getArtist() , test1 ));
-            }
 
-            for (int i = 0; i < artistList.size() ; i++){
-                if(songsInfo.getArtist().equals(artistList.get(i).getTitle())){
-
-                    artistList.get(i).addItem(songsInfo);
-
-                }
-            }
-        }
-
-        setList(artistList );
-
-    }
 
     public void setList(ArrayList<AlbumInfo> artistList ){
         artistList.sort(AlbumInfo.AppNameComparator);

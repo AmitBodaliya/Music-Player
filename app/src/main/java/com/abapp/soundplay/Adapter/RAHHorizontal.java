@@ -68,6 +68,11 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
             if (mClickListener != null) mClickListener.onItemClick(v, songsInfo, position, mData);
         });
 
+        holder.itemView.setOnLongClickListener(v -> {
+            if (mClickListener != null) mClickListener.onItemLongClick(v, songsInfo, position, mData);
+            return true;
+        });
+
         holder.menuImage.setOnClickListener(v -> {
             if (mClickListener != null) mClickListener.onMenuClick(v, songsInfo, position, mData);
         });
@@ -117,6 +122,7 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
+        void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
         void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list);
     }
 }

@@ -16,13 +16,8 @@ import com.abapp.soundplay.Activity.MainActivity;
 import com.abapp.soundplay.Adapter.RAHHorizontal;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
-import com.abapp.soundplay.Room.Fav.MyDatabaseFav;
-import com.abapp.soundplay.Room.Fav.TableFav;
-import com.abapp.soundplay.Room.History.MyDatabaseHistory;
-import com.abapp.soundplay.Room.History.TableHistory;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -33,10 +28,7 @@ public class FragmentMain extends Fragment {
     LinearLayout historyIconLayout, favIconLayout;
     LinearLayout historyLayout, favLayout, allSongLayout;
 
-    //database
-    MyDatabaseFav myDatabaseFav;
-    MyDatabaseHistory myDatabaseHistory;
-
+    //view
     RecyclerView recyclerViewAllSongs;
     RAHHorizontal adapterAllSongs;
 
@@ -45,9 +37,6 @@ public class FragmentMain extends Fragment {
 
     RecyclerView recyclerViewHistory;
     RAHHorizontal adapterAllHistory;
-
-    ArrayList<SongsInfo> arrayListFav;
-    ArrayList<SongsInfo> arrayListHistory;
 
     //live data
     LiveDataViewModel liveDataViewModel;
@@ -62,10 +51,6 @@ public class FragmentMain extends Fragment {
         context = requireContext();
         context = requireActivity();
 
-        //database
-        myDatabaseFav = MyDatabaseFav.getDatabase(context);
-        myDatabaseHistory = MyDatabaseHistory.getDatabase(context);
-
 
 //        ints
         favIconLayout = v.findViewById(R.id.favIconLayout);
@@ -75,8 +60,8 @@ public class FragmentMain extends Fragment {
         allSongLayout = v.findViewById(R.id.allSongLayout);
 
         //set on click
-        favIconLayout.setOnClickListener(v1 -> ((MainActivity) requireContext()).showAllFavSOng(arrayListFav));
-        historyIconLayout.setOnClickListener(v1 -> ((MainActivity) requireContext()).showHistory(arrayListHistory));
+        favIconLayout.setOnClickListener(v1 -> ((MainActivity) requireContext()).showAllFavSOng());
+        historyIconLayout.setOnClickListener(v1 -> ((MainActivity) requireContext()).showHistory());
 
 
         // recycler view
@@ -87,43 +72,9 @@ public class FragmentMain extends Fragment {
 
         //get list
         liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
-        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), this::setRecyclerViewAllSOng);
-
-        //set fav list
-        myDatabaseFav.myDao().getAllEntities().observe(getViewLifecycleOwner(), tableFavs -> {
-            Log.i("TAG", "onCreateView: " + tableFavs.size());
-            ArrayList<SongsInfo> arrayList1 = new ArrayList<>();
-            for (TableFav tableFav: tableFavs){
-                SongsInfo songsInfo = new SongsInfo(
-                        tableFav.SONGS_TITLE,
-                        tableFav.SONGS_ARTISTS,
-                        tableFav.SONGS_ALBUM,
-                        tableFav.SONGS_LENGTH,
-                        new File(tableFav.Song_Path));
-                arrayList1.add(songsInfo);
-            }
-            arrayListFav = arrayList1;
-            setRecyclerViewFav(arrayList1);
-        });
-
-
-        //set list history
-        myDatabaseHistory.myDao().getAllEntities().observe(getViewLifecycleOwner(), tableHistory -> {
-            ArrayList<SongsInfo> arrayList1 = new ArrayList<>();
-            for (TableHistory tableHistory1 : tableHistory){
-                SongsInfo songsInfo = new SongsInfo(
-                        tableHistory1.SONGS_TITLE,
-                        tableHistory1.SONGS_ARTISTS,
-                        tableHistory1.SONGS_ALBUM,
-                        tableHistory1.SONGS_LENGTH,
-                        new File(tableHistory1.Song_Path));
-                arrayList1.add(songsInfo);
-            }
-            arrayListHistory = arrayList1;
-            setRecyclerViewHistory(arrayList1);
-        });
-
-
+        liveDataViewModel.allSongLivaData.observe(getViewLifecycleOwner(), this::setRecyclerViewAllSOng);
+        liveDataViewModel.favSongLivaData.observe(getViewLifecycleOwner(), this::setRecyclerViewFav);
+        liveDataViewModel.recentSongLivaData.observe(getViewLifecycleOwner(), this::setRecyclerViewHistory);
 
         return v;
     }
@@ -141,6 +92,11 @@ public class FragmentMain extends Fragment {
             @Override
             public void onItemClick(View view, SongsInfo songsInfo, int position , ArrayList<SongsInfo> arrayList) {
                 ((MainActivity) requireActivity()).onItemClick(view, songsInfo ,position, arrayList );
+            }
+
+            @Override
+            public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+                ((MainActivity) requireActivity()).onItemLongClick(view, songsInfo ,position, arrayList );
             }
 
             @Override
@@ -168,6 +124,12 @@ public class FragmentMain extends Fragment {
             }
 
             @Override
+            public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+                ((MainActivity) requireActivity()).onItemLongClick(view, songsInfo ,position, arrayList );
+            }
+
+
+            @Override
             public void onMenuClick(View view, SongsInfo songsInfo, int position , ArrayList<SongsInfo> arrayList) {
                 ((MainActivity) requireActivity()).onMenuClick(view, songsInfo ,position, arrayList);
             }
@@ -189,6 +151,11 @@ public class FragmentMain extends Fragment {
             @Override
             public void onItemClick(View view, SongsInfo songsInfo, int position , ArrayList<SongsInfo> arrayList) {
                 ((MainActivity) requireActivity()).onItemClick(view, songsInfo ,position, arrayList );
+            }
+
+            @Override
+            public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+                ((MainActivity) requireActivity()).onItemLongClick(view, songsInfo ,position, arrayList );
             }
 
             @Override

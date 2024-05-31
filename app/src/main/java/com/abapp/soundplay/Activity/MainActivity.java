@@ -1,5 +1,7 @@
 package com.abapp.soundplay.Activity;
 
+import static android.util.Log.getStackTraceString;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -14,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +26,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -37,22 +40,20 @@ import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
+import com.abapp.soundplay.MyApplication;
 import com.abapp.soundplay.R;
-import com.abapp.soundplay.Room.Fav.FavRepository;
-import com.abapp.soundplay.Room.Fav.MyDatabaseFav;
-import com.abapp.soundplay.Room.History.HistoryRepository;
-import com.abapp.soundplay.Room.History.MyDatabaseHistory;
-import com.abapp.soundplay.Room.Songs.MyDatabaseSongs;
-import com.abapp.soundplay.Room.Songs.SongsRepository;
-import com.abapp.soundplay.Room.Songs.TableSongs;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
 import com.abapp.soundplay.ViewHalper.ShowListView;
 import com.abapp.soundplay.ViewHalper.SongInfoView;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
+import com.abapp.soundplay.params.HardCoreData;
+import com.abapp.soundplay.params.Prefs;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView albumImagePlayer;
     SeekBar seekBarPlayer;
     TextView titleTextPlayer;
+    ImageView btnNextPlayer;
     ImageView playPausePlayer;
 
 
@@ -80,18 +82,13 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<SongsInfo> upNextList = new ArrayList<>();
 
 
+    Prefs prefs;
     UniqueIdGen uniqueIdGen;
 
-    MyDatabaseSongs myDatabaseSongs;
-    SongsRepository songsRepository;
 
-    MyDatabaseFav myDatabaseFav;
-    FavRepository favRepository;
-
-    MyDatabaseHistory myDatabaseHistory;
-    HistoryRepository historyRepository;
-
+    //view model
     LiveDataViewModel liveDataViewModel;
+
 
 
 
@@ -99,16 +96,16 @@ public class MainActivity extends AppCompatActivity {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d("TAG", "onServiceConnected() called with: componentName = [" + componentName + "], iBinder = [" + iBinder + "]");
             musicBinder = (MusicPlayer_1.MusicBinder) iBinder;
-
             if (!musicBinder.isNull()) uiUpdate();
-
             MediaControllerCompat mediaController = musicBinder.getMediaController();
             MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            Log.d("TAG", "onServiceDisconnected() called with: componentName = [" + componentName + "]");
             musicBinder = null;
             MediaControllerCompat.setMediaController(MainActivity.this, null);
         }
@@ -116,81 +113,73 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(new MyApplication().applyCustomTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("TAG", "onCreate()");
+        setupCrashHandler();
 
         //music payer view
         content_dock_master = findViewById(R.id.content_dock_master);
         albumImagePlayer = findViewById(R.id.albumImagePlayer);
         seekBarPlayer = findViewById(R.id.seekBarPlayer);
         titleTextPlayer = findViewById(R.id.titleTextPlayer);
+        btnNextPlayer = findViewById(R.id.btnNextPlayer);
         playPausePlayer = findViewById(R.id.playPausePlayer);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         content_dock_master.setVisibility(View.GONE);
-
-
-        //set music player
-        Intent musicIntent = new Intent(this, MusicPlayer_1.class);
-        startService(musicIntent);
-        bindService(musicIntent , serviceConnection, Context.BIND_AUTO_CREATE);
-
-        // Create an instance of the ViewModel
-        liveDataViewModel = new ViewModelProvider(this).get(LiveDataViewModel.class);
-
-        uniqueIdGen = UniqueIdGen.getInstance();
-
-        //database
-        myDatabaseSongs = MyDatabaseSongs.getDatabase(this);
-        songsRepository = new SongsRepository(myDatabaseSongs);
-
-        myDatabaseFav = MyDatabaseFav.getDatabase(this);
-        favRepository = new FavRepository(myDatabaseFav);
-
-        myDatabaseHistory = MyDatabaseHistory.getDatabase(this);
-        historyRepository = new HistoryRepository(myDatabaseHistory);
-
-        mediaMetaData = new MediaMetaData(this);
-        fetchFileData = new FetchFileData(this);
-
-        //set default navigation view
-        setNavigationView();
-
-
-        //get list live update
-        myDatabaseSongs.myDao().getAllEntities().observe(this, tableSongs -> {
-            ArrayList<SongsInfo> arrayList1 = new ArrayList<>();
-            for (TableSongs tableSongs1 : tableSongs) {
-                SongsInfo songsInfo = new SongsInfo(
-                        tableSongs1.SONGS_TITLE,
-                        tableSongs1.SONGS_ARTISTS,
-                        tableSongs1.SONGS_ALBUM,
-                        tableSongs1.SONGS_LENGTH,
-                        new File(tableSongs1.Song_Path));
-                arrayList1.add(songsInfo);
+        content_dock_master.setOnTouchListener(new OnSwipeGesture(this){
+            @Override
+            public void onClick() {
+                openPlayingSong();
             }
 
-            liveDataViewModel.setData(arrayList1);
+            @Override
+            public void onSwipeTop() {
+                openPlayingSong();
+            }
         });
 
 
-        //update ui broadcast
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
 
-    }
+        //class
+        prefs = new Prefs(this);
+        uniqueIdGen = UniqueIdGen.getInstance();
 
-    public void setNavigationView(){
-        //set bottom nav view
+
+
+
+        // Create an instance of the ViewModel
+        liveDataViewModel = new ViewModelProvider(this).get(LiveDataViewModel.class);
+        liveDataViewModel.initData(this);
+
+
+
+        //media
+        mediaMetaData = new MediaMetaData(this);
+        fetchFileData = new FetchFileData(this);
+
+
+        //set default navigation view
         NavigationUI.setupWithNavController(bottomNavigationView, Navigation.findNavController(this, R.id.nav_host_fragment_activity_main));
-
         setDefaultNav();
+
+
+        //update ui broadcast
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
+
+
+        //refresh list of song
+        refreshList();
     }
+
+
 
 
 
@@ -199,108 +188,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // song menu
-    @SuppressLint("NonConstantResourceId")
-    public void onMenuClick(View view, SongsInfo songsInfo , int position, ArrayList<SongsInfo> listOnClick) {
-        File file = songsInfo.getPath();
-
-        SongsInfo temp = new SongsInfo();
-        temp.setUniqueID(uniqueIdGen.generateUniqueId());
-        temp.setTitle(songsInfo.getTitle1());
-        temp.setArtist(songsInfo.getArtist());
-        temp.setAlbum(songsInfo.getAlbum());
-        temp.setPath(songsInfo.getPath());
-        temp.setSongLength(songsInfo.getSongLength());
-        temp.setBitmapImage(songsInfo.getBitmapImage());
-
-        if (!file.exists()) return;
-
-        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenu );
-        PopupMenu popup = new PopupMenu(wrapper, view ,  Gravity.END);
-        popup.getMenuInflater().inflate(R.menu.popup_menu , popup.getMenu());
-
-        //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(item -> {
-
-            switch (item.getItemId()) {
-                //play
-                case R.id.item1: {
-                    onItemClick(view,songsInfo , position, listOnClick);
-                    return true;
-                }
-
-                //play next
-                case R.id.item2: {
-                    for (int i = 0; i < upNextList.size(); i++) {
-                        if (upNextList.get(i).getUniqueID().equals(currentSong.getUniqueID())){
-                            upNextList.add(i + 1 , temp);
-                            playerFullView.updateUpNextList(upNextList);
-                            break;
-                        }
-                    }
-                    return true;
-                }
-
-                //add to queue song
-                case R.id.item4:
-                    upNextList.add(temp);
-                    return true;
-
-                //add to favourite song
-                case R.id.item5:
-                    favRepository.insert(songsInfo);
-
-                    Toast.makeText(this, "Added to Favourite", Toast.LENGTH_SHORT).show();
-                    return true;
-
-                //set song info
-                case R.id.item6:
-                    songInfoDialog(file);
-                    return true;
-
-                //share song
-                case R.id.item7:
-                    try {
-                        String sharePath = file.toString();
-                        Intent share = new Intent(Intent.ACTION_SEND)
-                                .setType("audio/*")
-                                .putExtra(Intent.EXTRA_STREAM, Uri.parse(sharePath));
-
-                        startActivity(Intent.createChooser(share, "Share Sound File"));
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
-
-                    return true;
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        });
-
-        popup.show();
-    }
+    public void refreshList(){ liveDataViewModel.getAllNewSongList(); }
 
 
-    @SuppressLint("NonConstantResourceId")
-    public void albumMenu(View view, ArrayList<SongsInfo> list) {
-        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenu );
-        PopupMenu popup = new PopupMenu(wrapper, view ,  Gravity.START);
-        popup.getMenuInflater().inflate(R.menu.album_menu , popup.getMenu());
 
-        popup.setOnMenuItemClickListener(item -> {
 
-            //play
-            if (item.getItemId() == R.id.item_play) {
-                onItemClick(view, list.get(0), 0, list);
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-
-        });
-
-        popup.show();
-    }
 
 
 
@@ -327,33 +219,72 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showSongListDialog(String title, ArrayList<SongsInfo> list) {
-        if (title.equals("")) title = "<unknown>";
-        new ShowListView(this , this, "" + title , list);
+        if (title.isEmpty()) title = "<unknown>";
+        new ShowListView(this , this, title, list);
     }
 
 
-    public void showAllFavSOng(ArrayList<SongsInfo> arrayList) {
-        if (arrayList.isEmpty())
-            Toast.makeText(MainActivity.this, "No Favourite Song", Toast.LENGTH_SHORT).show();
-        else {
-            new ShowListView(MainActivity.this, MainActivity.this, "Favourite Songs", arrayList);
-        }
+    public void showAllFavSOng() {
+        ArrayList<SongsInfo> arrayList = liveDataViewModel.getFavList();
+        if (arrayList.isEmpty()) Toast.makeText(MainActivity.this, "No Favourite Song", Toast.LENGTH_SHORT).show();
+        else new ShowListView(MainActivity.this, MainActivity.this, "Favourite Songs", arrayList);
     }
 
 
-    public void showHistory(ArrayList<SongsInfo> arrayList) {
-        if (arrayList.isEmpty())
-            Toast.makeText(MainActivity.this, "No Recent Song", Toast.LENGTH_SHORT).show();
-        else {
-            new ShowListView(MainActivity.this, MainActivity.this, "Recent", arrayList);
-        }
+    public void showHistory() {
+        ArrayList<SongsInfo> arrayList = liveDataViewModel.getRecentList();
+        if (arrayList.isEmpty()) Toast.makeText(MainActivity.this, "No Recent Song", Toast.LENGTH_SHORT).show();
+        else new ShowListView(MainActivity.this, MainActivity.this, "Recent", arrayList);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 
 
     //on click
     public void onItemClick(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
-        v.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale));
+//        v.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale));
+
+        if(prefs.getPrefs(Prefs.directSong, false)){
+            showSeekTODialog(v, songsInfo, position, arrayList);
+        }else {
+            ArrayList<SongsInfo> finalLIst = new ArrayList<>();
+            assert arrayList != null;
+            for (SongsInfo songINfo : arrayList) {
+                songINfo.setUniqueID(uniqueIdGen.generateUniqueId());
+                finalLIst.add(songINfo);
+            }
+
+            currentSong = finalLIst.get(position);
+            upNextList = finalLIst;
+
+            musicBinder.playMedia(songsInfo, arrayList, 0);
+
+
+            if (playerFullView != null) playerFullView.dismissDialog();
+
+            playerFullView = new PlayerFullView(this, this, musicBinder, upNextList);
+            if (playerFullView.isShowing()) playerFullView.showDialog();
+        }
+
+    }
+
+
+
+    //on click
+    public void onItemLongClick(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+//        v.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale));
+        showSeekTODialog(v, songsInfo, position, arrayList);
+    }
+
+
+    public void onItemLongClickUtil(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList, int SeekTo) {
 
         ArrayList<SongsInfo> finalLIst = new ArrayList<>();
         for (SongsInfo songINfo: arrayList) {
@@ -364,24 +295,234 @@ public class MainActivity extends AppCompatActivity {
         currentSong = finalLIst.get(position);
         upNextList = finalLIst;
 
-        musicBinder.playMedia(songsInfo, arrayList);
+        musicBinder.playMedia(songsInfo, arrayList, SeekTo);
 
 
         if (playerFullView != null) playerFullView.dismissDialog();
 
         playerFullView = new PlayerFullView(this, this, musicBinder, upNextList);
-        playerFullView.showDialog();
-
+        if (playerFullView.isShowing()) playerFullView.showDialog();
     }
 
 
 
+    //on click
+    public void nextSong(SongsInfo songsInfo) {
+        songsInfo.setUniqueID(uniqueIdGen.generateUniqueId());
+
+        for (int i = 0; i < upNextList.size() ; i++) {
+            if (upNextList.get(i).getUniqueID().equals(currentSong.getUniqueID())) {
+                if(upNextList.size() == i + 1) upNextList.add(songsInfo);
+                else upNextList.add(i + 1, songsInfo);
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // song menu
+    @SuppressLint("NonConstantResourceId")
+    public void onMenuClick(View view, SongsInfo songsInfo , int position, ArrayList<SongsInfo> listOnClick) {
+        File file = songsInfo.getPath();
+
+        if (!file.exists()) return;
+
+        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenu );
+        PopupMenu popup = new PopupMenu(wrapper, view ,  Gravity.END);
+        popup.getMenuInflater().inflate(R.menu.popup_menu , popup.getMenu());
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(item -> {
+
+            if(item.getItemId() == R.id.item1){
+                onItemClick(view,songsInfo , position, listOnClick);
+            }
+            else if(item.getItemId() == R.id.item2){
+                nextSong(songsInfo);
+            }
+            else if(item.getItemId() == R.id.item4){
+                upNextList.add(songsInfo);
+            }
+            else if(item.getItemId() == R.id.item5){
+                liveDataViewModel.insertFav(songsInfo);
+                Toast.makeText(this, "Added to Favourite", Toast.LENGTH_SHORT).show();
+            }
+            else if(item.getItemId() == R.id.item6){
+                songInfoDialog(file);
+            }else if(item.getItemId() == R.id.item7){
+                try {
+                    String sharePath = file.toString();
+                    Intent share = new Intent(Intent.ACTION_SEND)
+                            .setType("audio/*")
+                            .putExtra(Intent.EXTRA_STREAM, Uri.parse(sharePath));
+
+                    startActivity(Intent.createChooser(share, "Share Sound File"));
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                }
+
+            }else {
+                return super.onOptionsItemSelected(item);
+            }
+            return true;
+        });
+
+        popup.show();
+    }
+
+
+
+
+
+    @SuppressLint("NonConstantResourceId")
+    public void albumMenu(View view, ArrayList<SongsInfo> list) {
+        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenu );
+        PopupMenu popup = new PopupMenu(wrapper, view ,  Gravity.START);
+        popup.getMenuInflater().inflate(R.menu.album_menu , popup.getMenu());
+
+        popup.setOnMenuItemClickListener(item -> {
+
+            //play
+            if (item.getItemId() == R.id.item_play) {
+                onItemClick(view, list.get(0), 0, list);
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+
+        });
+
+        popup.show();
+    }
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    public void showSeekTODialog(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this , R.style.BottomSheetDialogStyle );
+        bottomSheetDialog.setContentView(R.layout.dialog_seek_to);
+
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(songsInfo.getPath().toString());
+
+        ImageView albumArt = bottomSheetDialog.findViewById(R.id.songInfoAlbumArt);
+
+        TextView title = bottomSheetDialog.findViewById(R.id.titleSongInfo);
+        TextView artist = bottomSheetDialog.findViewById(R.id.artistSongInfo);
+        TextView album = bottomSheetDialog.findViewById(R.id.albumSongInfo);
+        TextView songDuration = bottomSheetDialog.findViewById(R.id.timeDuringScreen);
+        TextView timeCurrentScreen = bottomSheetDialog.findViewById(R.id.timeCurrentScreen);
+        SeekBar seekBarScreenTO = bottomSheetDialog.findViewById(R.id.seekBarScreenTO);
+        Button btnPlay = bottomSheetDialog.findViewById(R.id.btnPlaySong);
+
+
+        //set bitmap on songInfo
+        assert albumArt != null;
+        if (mediaMetaData.getSongBitmap(songsInfo.getPath()) != null) {
+            albumArt.setImageBitmap(mediaMetaData.getSongBitmap(songsInfo.getPath()));
+        } else albumArt.setImageResource(R.drawable.baseline_music_note_24);
+
+
+
+        //title.setText(uri.getName());
+        assert title != null;
+        title.setText(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+        assert artist != null;
+        artist.setText(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+        assert album != null;
+        album.setText(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+
+
+        //set Duration song
+        long dur = Long.parseLong(Objects.requireNonNull(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
+        String Sec = String.valueOf((dur % 60000) / 1000);
+        String min = String.valueOf(dur / 60000);
+
+        assert songDuration != null;
+        songDuration.setText((Sec.length() == 1)? min + ":0" + Sec : min + ":" + Sec);
+
+
+        //set seek Bar max
+        assert seekBarScreenTO != null;
+        seekBarScreenTO.setMax((int) dur);
+
+        seekBarScreenTO.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                String Sec = String.valueOf((progress % 60000) / 1000);
+                String min = String.valueOf(progress / 60000);
+
+                assert timeCurrentScreen != null;
+                timeCurrentScreen.setText((Sec.length() == 1)? min + ":0" + Sec : min + ":" + Sec);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        assert btnPlay != null;
+        btnPlay.setOnClickListener(view -> {
+            onItemLongClickUtil(v, songsInfo, position, arrayList, seekBarScreenTO.getProgress());
+            bottomSheetDialog.dismiss();
+        });
+
+
+        bottomSheetDialog.show();
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+    //ui update from service
     BroadcastReceiver broadcastReceiverUpdateUi = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             uiUpdate();
         }
     };
+
+
+
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     public void uiUpdate(){
@@ -404,26 +545,27 @@ public class MainActivity extends AppCompatActivity {
 
 
         content_dock_master.setVisibility(View.VISIBLE);
-//        content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
-//            @Override
-//            public void onClick() {
-//                openPlayingSong();
-//            }
-//
-//            @Override
-//            public void onSwipeTop() {
-//                openPlayingSong();
-//            }
-//        });
+        content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
+            @Override
+            public void onClick() {
+                openPlayingSong();
+            }
+
+            @Override
+            public void onSwipeTop() {
+                openPlayingSong();
+            }
+        });
 
 
         //set album art
         Bitmap bitmap = mediaMetaData.getSongBitmap(songsInfo.getPath());
-        if (bitmap != null) {
-            albumImagePlayer.setImageBitmap(bitmap);
-        } else {
-            albumImagePlayer.setImageResource(R.drawable.baseline_music_note_24);
-        }
+        if (bitmap != null) albumImagePlayer.setImageBitmap(bitmap);
+        else albumImagePlayer.setImageResource(R.drawable.baseline_music_note_24);
+
+        //on play pause click
+        btnNextPlayer.setOnClickListener(v -> musicBinder.nextSong());
+
 
         //on play pause click
         playPausePlayer.setOnClickListener(v -> {
@@ -482,17 +624,58 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
+
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent musicIntent = new Intent(this, MusicPlayer_1.class);
+        startService(musicIntent);
+        bindService(musicIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service if it's bound
+//        unbindService(serviceConnection);
+//        unregisterReceiver(broadcastReceiverUpdateUi);
+    }
+
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(serviceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiverUpdateUi);
     }
 
-    @Override
-    public void onBackPressed() {
-        setDefaultNav();
+
+
+    public void restartApp() {
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
+
+
+
+
+    private void setupCrashHandler() {
+        Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
+            Log.d("TAG", "setupCrashHandler() called " + exception.getMessage());
+            exception.printStackTrace();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(10);
+        });
+    }
+
 
 
 }

@@ -1,23 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="black">#FF000000</color>
+    <color name="black">#313131</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#8BC34A</color>
     <color name="blue">#00BCD4</color>
 
 
-    <color name="colorPrimary">#9BA2AC</color>
-    <color name="colorSecondary">#EBEBEB</color>
+    <color name="colorPrimary">#E5E5E5</color>
+    <color name="colorSecondary">#FFFFFF</color>
     <color name="fadeColorSecondary">#B1B1B1</color>
     <color name="colorSecondaryVar">#C2C2C2</color>
 
-    <color name="colorAccent">#FF9800</color>
     <color name="colorDull">#66000000</color>
     <color name="textColor">@color/black</color>
     <color name="fadeTextColor">#202020</color>
     <color name="tabSelectTextColor">#000000</color>
     <color name="colorControlNormal">@color/black</color>
     <color name="divider_color">#E6FFFFFF</color>
+
+
+
+
+    <color name="colorAccent1">#F44336</color>
+    <color name="colorAccent2">#E91E63</color>
+    <color name="colorAccent3">#9C27B0</color>
+    <color name="colorAccent4">#673AB7</color>
+    <color name="colorAccent5">#3F51B5</color>
+    <color name="colorAccent6">#2196F3</color>
+    <color name="colorAccent7">#03A9F4</color>
+    <color name="colorAccent8">#00BCD4</color>
+    <color name="colorAccent9">#009688</color>
+    <color name="colorAccent10">#4CAF50</color>
+    <color name="colorAccent11">#8BC34A</color>
+    <color name="colorAccent12">#CDDC39</color>
+    <color name="colorAccent13">#FFEB3B</color>
+    <color name="colorAccent14">#FFC107</color>
+    <color name="colorAccent15">#FF9800</color>
+    <color name="colorAccent16">#FF5722</color>
+
+
+
+
+<!--    <color name="colorPrimary1">#DCDCDC</color>-->
+<!--    <color name="colorPrimary2">#E91E63</color>-->
+<!--    <color name="colorPrimary3">#9C27B0</color>-->
+<!--    <color name="colorPrimary4">#673AB7</color>-->
+<!--    <color name="colorPrimary5">#3F51B5</color>-->
+<!--    <color name="colorPrimary6">#2196F3</color>-->
+<!--    <color name="colorPrimary7">#03A9F4</color>-->
+<!--    <color name="colorPrimary8">#00BCD4</color>-->
+<!--    <color name="colorPrimary9">#009688</color>-->
+<!--    <color name="colorPrimary10">#4CAF50</color>-->
+<!--    <color name="colorPrimary11">#8BC34A</color>-->
+<!--    <color name="colorPrimary12">#CDDC39</color>-->
+<!--    <color name="colorPrimary13">#FFEB3B</color>-->
+<!--    <color name="colorPrimary14">#FFC107</color>-->
+<!--    <color name="colorPrimary15">#FF9800</color>-->
+<!--    <color name="colorPrimary16">#FF5722</color>-->
+
+
+
 
 </resources>

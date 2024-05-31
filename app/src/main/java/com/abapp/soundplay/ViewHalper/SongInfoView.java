@@ -12,6 +12,7 @@ import com.abapp.soundplay.Helper.MediaMetaData;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
+import java.util.Objects;
 
 public class SongInfoView {
 
@@ -40,7 +41,6 @@ public class SongInfoView {
         mediaMetadataRetriever.setDataSource(uri.toString());
 
         ImageView albumArt = bottomSheetDialog.findViewById(R.id.songInfoAlbumArt);
-        ImageView cancelButton = bottomSheetDialog.findViewById(R.id.songInfoCancel);
 
         TextView title = bottomSheetDialog.findViewById(R.id.titleSongInfo);
         TextView artist = bottomSheetDialog.findViewById(R.id.artistSongInfo);
@@ -79,25 +79,20 @@ public class SongInfoView {
         assert size != null;
         size.setText(String.format("%.2f", a) + " MB");
 
-        long bit = Long.parseLong(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+        long bit = Long.parseLong(Objects.requireNonNull(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)));
         assert bitRate != null;
         bitRate.setText(bit / 1000 + " kbps");
 
         //set Duration song
-        long dur = Long.parseLong(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+        long dur = Long.parseLong(Objects.requireNonNull(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
         String Sec = String.valueOf((dur % 60000) / 1000);
         String min = String.valueOf(dur / 60000);
 
         assert songDuration != null;
         songDuration.setText((Sec.length() == 1)? min + ":0" + Sec : min + ":" + Sec);
 
-        assert cancelButton != null;
-        cancelButton.setOnClickListener(v -> bottomSheetDialog.dismiss());
-
         bottomSheetDialog.show();
 
-
     }
-
 
 }

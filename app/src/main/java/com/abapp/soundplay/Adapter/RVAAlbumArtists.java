@@ -58,13 +58,11 @@ public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHo
 
         //set title
         String artistName = albumInfo.getTitle();
-        holder.titleName.setText((artistName.equals("")? "<unknown>" : artistName));
+        holder.titleName.setText((artistName.isEmpty() ? "<unknown>" : artistName)); //title
 
-//            set song bitmap
+        //set song bitmap
         Bitmap testBitmap = musicArt.getAlbumArt(albumInfo.getArrayList().get(0), holder.titleImage);
-        if (testBitmap != null) {
-            holder.titleImage.setImageBitmap(testBitmap);
-        }
+        if (testBitmap != null) holder.titleImage.setImageBitmap(testBitmap);
     }
 
 

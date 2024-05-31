@@ -3,28 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_top_round"
+    android:paddingTop="10dp"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="100dp"
+        android:layout_height="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/background_line"/>
+
 
     <LinearLayout
         android:id="@+id/actionBar"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:paddingHorizontal="10dp"
-        android:background="@color/colorSecondary">
-
-        <ImageView
-            android:id="@+id/backUpNext"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:padding="10dp"
-            android:src="@drawable/baseline_arrow_back_24"
-            android:contentDescription="@string/todo" />
+        android:layout_height="45dp"
+        android:paddingHorizontal="10dp">
 
         <TextView
             android:id="@+id/titleUpNext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingHorizontal="10dp"
             android:text="@string/up_next_list"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -37,7 +37,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/upNextRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

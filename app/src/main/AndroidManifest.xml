@@ -10,7 +10,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- storage -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -50,16 +52,6 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustNothing"
             android:exported="true" />
-
-        <activity
-            android:name=".Activity.AboutActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="false" />
-
-        <activity
-            android:name=".Activity.SettingActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="false" />
 
         <activity
             android:name=".Activity.SplashActivity"
@@ -108,13 +100,10 @@
         </activity>
 
 
-
-
         <service
-
             android:name=".Music.MusicPlayer_1"
-            android:foregroundServiceType="mediaPlayback">
-
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ForegroundServicePermission">
         </service>
 
 

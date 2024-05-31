@@ -26,6 +26,8 @@ public class FragmentAllSong extends Fragment {
     public FragmentAllSong() {
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_allsong, container, false);
@@ -35,24 +37,29 @@ public class FragmentAllSong extends Fragment {
 
         //get list
         liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
-        liveDataViewModel.getLiveList().observe(getViewLifecycleOwner(), arrayList -> setRecyclerView(recyclerView, arrayList));
+        liveDataViewModel.allSongLivaData.observe(getViewLifecycleOwner(), arrayList -> setRecyclerView(recyclerView, arrayList));
 
         return v;
     }
 
+
+
+
     void setRecyclerView(RecyclerView recyclerView, ArrayList<SongsInfo> arrayList){
-
-
         RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(requireContext(), arrayList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
-
         recyclerViewAdapter.setClickListener(new RecyclerViewAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, SongsInfo songsInfo, int position , ArrayList<SongsInfo> arrayList) {
                 ((MainActivity) requireActivity()).onItemClick(view, songsInfo ,position, arrayList );
+            }
+
+            @Override
+            public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
+                ((MainActivity) requireActivity()).onItemLongClick(view, songsInfo ,position, arrayList );
             }
 
             @Override

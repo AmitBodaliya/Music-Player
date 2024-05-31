@@ -123,9 +123,13 @@ public class FragmentFolders extends Fragment {
                 if(tempUri.isDirectory()){
                     uri = tempUri;
                     setRecyclerview(tempUri);
-                }else{
-                    ((MainActivity) requireActivity()).onItemClick(view,songsInfo,position , mySongList);
-                }
+                } else ((MainActivity) requireActivity()).onItemClick(view,songsInfo,position , mySongList);
+            }
+
+            @Override
+            public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
+                File tempUri = songsInfo.getPath();
+                if(!tempUri.isDirectory()) ((MainActivity) requireActivity()).onItemLongClick(view,songsInfo,position , mySongList);
             }
 
             @Override

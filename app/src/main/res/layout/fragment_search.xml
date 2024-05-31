@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="?attr/colorPrimary"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -45,9 +45,38 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="7dp"
+        app:cardElevation="0dp"
+        android:layout_margin="@dimen/cardMargin"
+        android:backgroundTint="@android:color/transparent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewArtistSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.cardview.widget.CardView>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/emptyListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_result"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:paddingVertical="50dp"
+        android:textSize="18sp"/>
+
+
 
 </LinearLayout>

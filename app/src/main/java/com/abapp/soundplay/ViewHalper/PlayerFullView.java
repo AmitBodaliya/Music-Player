@@ -1,6 +1,5 @@
 package com.abapp.soundplay.ViewHalper;
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,12 +47,12 @@ public class PlayerFullView {
     MediaMetadataRetriever mediaMetadataRetriever;
     MediaMetaData mediaMetaData;
 
-    boolean djMode = false;
+//    boolean djMode = false;
 
 
     //ints
     MotionLayout motionLayout;
-    LinearLayout expandUpNextList;
+    ImageView expandUpNextList;
 
     ImageView songInfoScreen;
     ImageView imageViewF;
@@ -97,6 +95,13 @@ public class PlayerFullView {
     }
 
 
+    public boolean isShowing(){
+        if (alertDialog == null) return false;
+        return alertDialog.isShowing();
+    }
+
+
+
 
     //searchFunction
     @SuppressLint({"ResourceAsColor", "SetTextI18n", "DefaultLocale", "ClickableViewAccessibility"})
@@ -121,7 +126,7 @@ public class PlayerFullView {
 
 //        ints
         motionLayout = mView.findViewById(R.id.motionLayout);
-        expandUpNextList = mView.findViewById(R.id.background);
+        expandUpNextList = mView.findViewById(R.id.imageViewShowList);
 
         songInfoScreen = mView.findViewById(R.id.songInfoScreen);
         imageViewF = mView.findViewById(R.id.favouriteScreen);
@@ -145,13 +150,41 @@ public class PlayerFullView {
         alertDialog.setCanceledOnTouchOutside(false);
 
 
+
         if (alertDialog.getWindow() != null) {
             alertDialog.getWindow().getAttributes().windowAnimations = R.style.SlidingDialogAnimation;
         }
 
 
+
+
         //on click expand to end
         expandUpNextList.setOnClickListener(view -> motionLayout.transitionToEnd());
+        motionLayout.setTransitionListener(new MotionLayout.TransitionListener() {
+            @Override
+            public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
+
+            }
+
+            @Override
+            public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
+                expandUpNextList.setRotation(progress * 180);
+            }
+
+            @Override
+            public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
+                if (currentId == motionLayout.getStartState()){
+                    expandUpNextList.setOnClickListener(view -> motionLayout.transitionToEnd());
+                }else {
+                    expandUpNextList.setOnClickListener(view -> motionLayout.transitionToStart());
+                }
+            }
+
+            @Override
+            public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
+
+            }
+        });
 
 
 
@@ -340,21 +373,16 @@ public class PlayerFullView {
 
 
         //set next prev enable or not
-        if (djMode) {
-            nextFullScreenAlert.setImageResource(R.drawable.du_skip_next);
-            previousFullScreenAlert.setImageResource(R.drawable.du_skip_prev);
-        } else {
-            for (int i = 0; i < upNextList.size(); i++) {
-                if (currentSongInfo.getUniqueID().equals(upNextList.get(i).getUniqueID())) {
+        for (int i = 0; i < upNextList.size(); i++) {
+            if (currentSongInfo.getUniqueID().equals(upNextList.get(i).getUniqueID())) {
 
-                    if (i + 1 < upNextList.size()) {
-                        nextFullScreenAlert.setImageResource(R.drawable.baseline_skip_next_24);
-                    } else nextFullScreenAlert.setImageResource(R.drawable.du_skip_next);
+                if (i + 1 < upNextList.size()) {
+                    nextFullScreenAlert.setImageResource(R.drawable.baseline_skip_next_24);
+                } else nextFullScreenAlert.setImageResource(R.drawable.du_skip_next);
 
-                    if (0 <= i - 1) {
-                        previousFullScreenAlert.setImageResource(R.drawable.baseline_skip_previous_24);
-                    } else previousFullScreenAlert.setImageResource(R.drawable.du_skip_prev);
-                }
+                if (0 <= i - 1) {
+                    previousFullScreenAlert.setImageResource(R.drawable.baseline_skip_previous_24);
+                } else previousFullScreenAlert.setImageResource(R.drawable.du_skip_prev);
             }
         }
 
