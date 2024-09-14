@@ -24,6 +24,7 @@ import com.abapp.soundplay.Model.AlbumInfo;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ public class FragmentSearch extends Fragment {
 
     //list
     TextView emptyListView;
-    RecyclerView recyclerViewSearch;
+    FastScrollRecyclerView recyclerViewSearch;
     RecyclerView recyclerViewArtistS;
 
     RecyclerViewAdapter adapter;
@@ -95,7 +96,7 @@ public class FragmentSearch extends Fragment {
                 if (!editTextSearch.getText().toString().isEmpty()) {
                     searchProcess(editTextSearch.getText().toString());
                 } else {
-                    serRecyclerViewSong(arrayListAll);
+                    setListData(arrayListAll);
                     setRecyclerViewArtist(arrayListArtist);
                 }
 
@@ -117,9 +118,12 @@ public class FragmentSearch extends Fragment {
             keyboard.showSoftInput(editTextSearch, 0);
 
             //show all list
-            serRecyclerViewSong(arrayListAll);
+            setListData(arrayListAll);
             setRecyclerViewArtist(arrayListArtist);
         },200);
+
+
+        initRecyclerViewSong();
 
 
         return v;
@@ -145,7 +149,7 @@ public class FragmentSearch extends Fragment {
             }
         }
 
-        serRecyclerViewSong(searchResultListSong);
+        setListData(searchResultListSong);
         setRecyclerViewArtist(searchResultListArtist);
 
         if(searchResultListSong.isEmpty() && searchResultListArtist.isEmpty()) emptyListView.setVisibility(View.VISIBLE);
@@ -184,12 +188,17 @@ public class FragmentSearch extends Fragment {
     }
 
 
+    void setListData(ArrayList<SongsInfo> data){
+        adapter.updateList(data);
+    }
 
-    public void serRecyclerViewSong(ArrayList<SongsInfo> list) {
+
+
+    public void initRecyclerViewSong() {
 
         //ready list show in recycler view view
         recyclerViewSearch.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new RecyclerViewAdapter(context, list);
+        adapter = new RecyclerViewAdapter(context);
         adapter.setClickListener(new RecyclerViewAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {

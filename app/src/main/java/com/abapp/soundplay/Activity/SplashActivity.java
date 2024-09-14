@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,11 +41,17 @@ public class SplashActivity extends AppCompatActivity {
     Prefs prefs;
     SongsRepository songsRepository;
 
+    Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(new MyApplication().applyCustomTheme(this));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        intent = getIntent();
+
+
 
         prefs = new Prefs(this);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS , WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -103,7 +110,13 @@ public class SplashActivity extends AppCompatActivity {
 
                 //main activity
                 runOnUiThread(() -> {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    Intent intent1 = new Intent(SplashActivity.this, MainActivity.class);
+                    if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+                        Uri audioUri = intent.getData();
+                        if (audioUri != null) intent1.putExtra("FILE_PATH", audioUri.toString());
+                    }
+                    startActivity(intent1);
+
                     finish();
                 });
 
@@ -111,7 +124,13 @@ public class SplashActivity extends AppCompatActivity {
 
                 //main activity
                 runOnUiThread(() -> {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    Intent intent1 = new Intent(SplashActivity.this, MainActivity.class);
+                    if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+                        Uri audioUri = intent.getData();
+                        if (audioUri != null) intent1.putExtra("FILE_PATH", audioUri.toString());
+                    }
+                    startActivity(intent1);
+
                     finish();
                 });
                 startActivity.set(true);

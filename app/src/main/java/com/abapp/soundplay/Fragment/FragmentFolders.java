@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -17,15 +18,19 @@ import com.abapp.soundplay.Adapter.RecyclerViewAdapter;
 import com.abapp.soundplay.Helper.FetchFileData;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.Model.SongsInfo;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FragmentFolders extends Fragment {
 
-    RecyclerView recyclerView;
+    ProgressBar progressBar;
+    FastScrollRecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter ;
 
     //ints
@@ -54,6 +59,8 @@ public class FragmentFolders extends Fragment {
         back = v.findViewById(R.id.backFolder);
         recyclerViewPath = v.findViewById(R.id.recyclerViewPath);
 
+        progressBar = v.findViewById(R.id.progressBar);
+
 
         if(defaultFile.equals(uri.toString()))  back.setVisibility(View.GONE);
         else back.setVisibility(View.VISIBLE);
@@ -62,7 +69,7 @@ public class FragmentFolders extends Fragment {
             if(!uri.toString().equals(defaultFile) ){
                 uri = uri.getParentFile();
                 assert uri != null;
-                setRecyclerview(uri);
+                getList(uri);
                 back.setVisibility(View.VISIBLE);
             }
             else back.setVisibility(View.GONE);
@@ -70,48 +77,76 @@ public class FragmentFolders extends Fragment {
 
 
 
-        setRecyclerview(uri);
+        getList(uri);
         return v;
     }
 
 
-    public void setRecyclerview(File file){
+    public void getList(File file){
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
 
-        // set folder path
-        List<String> mTexts = new ArrayList<>();
-        File tempFile = file;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
 
-        while (true){
-            assert tempFile != null;
-            if (tempFile.equals(Environment.getExternalStorageDirectory())){
-                mTexts.add("Storage/");
-                break;
-            }else {
-                mTexts.add(tempFile.getName() + "/");
-                tempFile = tempFile.getParentFile();
+            // set folder path
+            List<String> mTexts = new ArrayList<>();
+            File tempFile = file;
+
+            while (true){
+                assert tempFile != null;
+                if (tempFile.equals(Environment.getExternalStorageDirectory())){
+                    mTexts.add("Storage/");
+                    break;
+                }else {
+                    mTexts.add(tempFile.getName() + "/");
+                    tempFile = tempFile.getParentFile();
+                }
             }
-        }
 
-        Collections.reverse(mTexts);
-        recyclerViewPath.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false);
-        linearLayoutManager.scrollToPosition(mTexts.size() - 1);
-        recyclerViewPath.setLayoutManager(linearLayoutManager);
-        folderPathAdapter = new FolderPathAdapter(mTexts);
-        recyclerViewPath.setAdapter(folderPathAdapter);
-
-
-        //set back button
-        if(!defaultFile.equals(file.toString())) back.setVisibility(View.VISIBLE);
-        else back.setVisibility(View.GONE);
+            requireActivity().runOnUiThread(() -> {
+                Collections.reverse(mTexts);
+                recyclerViewPath.setHasFixedSize(true);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false);
+                linearLayoutManager.scrollToPosition(mTexts.size() - 1);
+                recyclerViewPath.setLayoutManager(linearLayoutManager);
+                folderPathAdapter = new FolderPathAdapter(mTexts);
+                recyclerViewPath.setAdapter(folderPathAdapter);
 
 
-        ArrayList<SongsInfo> mySongDirList = fetchFileData.fetchFile(file, false, true, false);
-        ArrayList<SongsInfo> mySongList = fetchFileData.fetchFile(file, true , false , false);
+                //set back button
+                if(!defaultFile.equals(file.toString())) back.setVisibility(View.VISIBLE);
+                else back.setVisibility(View.GONE);
+            });
 
-        mySongDirList.addAll(mySongList);
 
-        recyclerViewAdapter = new RecyclerViewAdapter(requireContext() , mySongDirList);
+
+
+
+            ArrayList<SongsInfo> mySongDirList = fetchFileData.fetchFile(file, false, true, false);
+            ArrayList<SongsInfo> mySongList = fetchFileData.fetchFile(file, true , false , false);
+
+            mySongDirList.addAll(mySongList);
+
+
+            // Update the UI on the main thread
+            requireActivity().runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                setRecyclerview(mySongDirList, mySongList);
+            });
+        });
+    }
+
+    //set Data
+    void setListData(ArrayList<SongsInfo> data){
+        recyclerViewAdapter.updateList(data);
+    }
+
+
+    public void setRecyclerview(ArrayList<SongsInfo> dirList, ArrayList<SongsInfo> songList){
+        recyclerViewAdapter = new RecyclerViewAdapter(requireContext());
+        setListData(dirList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -122,19 +157,19 @@ public class FragmentFolders extends Fragment {
                 File tempUri = songsInfo.getPath();
                 if(tempUri.isDirectory()){
                     uri = tempUri;
-                    setRecyclerview(tempUri);
-                } else ((MainActivity) requireActivity()).onItemClick(view,songsInfo,position , mySongList);
+                    getList(tempUri);
+                } else ((MainActivity) requireActivity()).onItemClick(view,songsInfo,position  - dirList.size() + songList.size(), songList);
             }
 
             @Override
             public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
                 File tempUri = songsInfo.getPath();
-                if(!tempUri.isDirectory()) ((MainActivity) requireActivity()).onItemLongClick(view,songsInfo,position , mySongList);
+                if(!tempUri.isDirectory()) ((MainActivity) requireActivity()).onItemLongClick(view, songsInfo, position - dirList.size() + songList.size() , songList);
             }
 
             @Override
             public void onMenuClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
-                ((MainActivity) requireActivity()).onMenuClick(view, songsInfo ,position, list);
+                ((MainActivity) requireActivity()).onMenuClick(view, songsInfo ,position - dirList.size() + songList.size(), list);
             }
         });
     }

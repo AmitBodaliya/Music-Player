@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,16 +20,19 @@ import com.abapp.soundplay.R;
 import com.abapp.soundplay.Model.AlbumInfo;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FragmentAlbum extends Fragment {
 
     Context context;
 
-    RecyclerView recyclerView;
+    FastScrollRecyclerView recyclerView;
     RVAAlbumArtists adapter;
 
     LiveDataViewModel liveDataViewModel;
@@ -44,13 +48,28 @@ public class FragmentAlbum extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_album, container, false);
 
+        //view
         context = requireActivity();
         recyclerView = v.findViewById(R.id.recyclerViewAlbum);
 
+        //progress bar
+        ProgressBar progressBar = v.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
-        //get list
-        liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
-        liveDataViewModel.albumLivaData.observe(getViewLifecycleOwner(), this::setList);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+
+            // Update the UI on the main thread
+            requireActivity().runOnUiThread(() -> {
+
+                //get list
+                liveDataViewModel = new ViewModelProvider(requireActivity()).get(LiveDataViewModel.class);
+                liveDataViewModel.albumLivaData.observe(getViewLifecycleOwner(), this::setList);
+                progressBar.setVisibility(View.GONE);
+
+            });
+        });
 
         return v;
     }

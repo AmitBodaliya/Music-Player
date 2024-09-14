@@ -637,7 +637,7 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
      * @return Notification
      */
     public Notification getNotification(boolean musicIsPlaying ,SongsInfo songsInfo) {
-        Bitmap icon = MusicArt.getInstance().getAlbumArt(songsInfo , null);
+        Bitmap icon = MusicArt.getInstance().getAlbumArt(songsInfo);
 
         // Create the channel if necessary
         initChannels(this);

@@ -51,6 +51,7 @@
             android:name=".Activity.MainActivity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustNothing"
+            android:hardwareAccelerated="true"
             android:exported="true" />
 
         <activity

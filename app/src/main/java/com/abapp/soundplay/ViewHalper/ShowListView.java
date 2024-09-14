@@ -25,6 +25,12 @@ public class ShowListView {
     Activity activity;
     MainActivity mainActivity;
 
+
+    RecyclerView recyclerView;
+    RecyclerViewAdapter adapter;
+
+
+
     public ShowListView(Context context , MainActivity mainActivity, String title, ArrayList<SongsInfo> arrayList) {
         this.context = context;
         this.mainActivity = mainActivity;
@@ -44,7 +50,7 @@ public class ShowListView {
 
 
         TextView textView = bottomSheetDialog.findViewById(R.id.titleUpNext);
-        RecyclerView recyclerView = bottomSheetDialog.findViewById(R.id.upNextRecyclerView);
+        recyclerView = bottomSheetDialog.findViewById(R.id.upNextRecyclerView);
 
 
         assert textView != null;
@@ -53,29 +59,19 @@ public class ShowListView {
         //ready list show in recycler view view
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        RecyclerViewAdapter adapter = getRecyclerViewAdapter(arrayList, bottomSheetDialog);
-        recyclerView.setAdapter(adapter);
-
-        bottomSheetDialog.show();
-    }
-
-
-
-
-    @NonNull
-    private RecyclerViewAdapter getRecyclerViewAdapter(ArrayList<SongsInfo> arrayList, BottomSheetDialog alertDialog) {
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(context, arrayList);
+        adapter = new RecyclerViewAdapter(context);
+        adapter.updateList(arrayList);
         adapter.setClickListener(new RecyclerViewAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
                 mainActivity.onItemClick(view, songsInfo, position, list);
-                alertDialog.dismiss();
+                bottomSheetDialog.dismiss();
             }
 
             @Override
             public void onItemLongClick(View view, SongsInfo songsInfo, int position, ArrayList<SongsInfo> list) {
                 mainActivity.onItemLongClick(view, songsInfo, position, list);
-                alertDialog.dismiss();
+                bottomSheetDialog.dismiss();
             }
 
             @Override
@@ -83,8 +79,9 @@ public class ShowListView {
                 mainActivity.onMenuClick(view, songsInfo , position, list);
             }
         });
-        return adapter;
-    }
+        recyclerView.setAdapter(adapter);
 
+        bottomSheetDialog.show();
+    }
 
 }

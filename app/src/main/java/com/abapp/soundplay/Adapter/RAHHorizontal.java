@@ -58,10 +58,8 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
         holder.playerArtists.setText(songsInfo.getArtist());
 
 //            set song bitmap
-        Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
-        if (testBitmap != null) {
-            holder.imageViewID.setImageBitmap(testBitmap);
-        }
+        Bitmap testBitmap = musicArt.getAlbumArt(songsInfo);
+        if (testBitmap != null) holder.imageViewID.setImageBitmap(testBitmap);
 
 
         holder.itemView.setOnClickListener(v -> {

@@ -70,10 +70,8 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
             holder.myTextView.setText(nameOfSOng);
 
 //            set song bitmap
-            Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
-            if (testBitmap != null) {
-                holder.imageViewID.setImageBitmap(testBitmap);
-            }
+            Bitmap testBitmap = musicArt.getAlbumArt(songsInfo);
+            if (testBitmap != null) holder.imageViewID.setImageBitmap(testBitmap);
 
 
             //set artist

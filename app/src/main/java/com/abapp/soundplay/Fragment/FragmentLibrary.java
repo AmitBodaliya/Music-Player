@@ -21,7 +21,7 @@ public class FragmentLibrary extends Fragment {
     View view;
     Context context;
 
-    String[] tabTitle = {"Songs", "Album", "Artists", "Folder"};
+    String[] tabTitle = {"Songs", "Album", "Artists"};
 
     //ints
     TabLayout tabLayout;

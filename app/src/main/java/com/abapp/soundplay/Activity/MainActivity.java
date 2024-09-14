@@ -175,6 +175,15 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
 
 
+        String filePath = getIntent().getStringExtra("FILE_PATH");
+        if(filePath != null && !filePath.isEmpty()){
+            ArrayList<SongsInfo> newList = new ArrayList<>();
+            SongsInfo songsInfo = fetchFileData.createSongInfoFromUri(Uri.parse(filePath));
+            newList.add(songsInfo);
+            onItemLongClick(null, songsInfo, 0, newList);
+        }
+
+
         //refresh list of song
         refreshList();
     }
@@ -280,7 +289,9 @@ public class MainActivity extends AppCompatActivity {
     //on click
     public void onItemLongClick(View v, SongsInfo songsInfo, int position, ArrayList<SongsInfo> arrayList) {
 //        v.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale));
-        showSeekTODialog(v, songsInfo, position, arrayList);
+        if(liveDataViewModel.isSongFilePresent(songsInfo.getPath().toString())){
+            showSeekTODialog(v, songsInfo, position, arrayList);
+        }
     }
 
 
@@ -441,10 +452,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         //set bitmap on songInfo
+        File uri = songsInfo.getPath();
         assert albumArt != null;
-        if (mediaMetaData.getSongBitmap(songsInfo.getPath()) != null) {
-            albumArt.setImageBitmap(mediaMetaData.getSongBitmap(songsInfo.getPath()));
-        } else albumArt.setImageResource(R.drawable.baseline_music_note_24);
+        if (uri != null) {
+            Bitmap songBitmap = mediaMetaData.getSongBitmap(songsInfo.getPath());
+            if (songBitmap != null) albumArt.setImageBitmap(songBitmap);
+            else albumArt.setImageResource(R.drawable.baseline_music_note_24);
+        } else {
+            albumArt.setImageResource(R.drawable.baseline_music_note_24);
+        }
 
 
 

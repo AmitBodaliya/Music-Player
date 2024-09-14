@@ -62,10 +62,16 @@
     </androidx.cardview.widget.CardView>
 
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/searchRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:fastScrollAutoHide="false"
+        app:fastScrollPopupBgColor="?attr/colorAccent"
+        app:fastScrollPopupTextColor="@color/textColor"
+        app:fastScrollThumbColor="?attr/colorAccent"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="?attr/colorAccent" />
 
     <TextView
         android:id="@+id/emptyListView"

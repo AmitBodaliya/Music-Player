@@ -2,24 +2,33 @@ package com.abapp.soundplay.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abapp.soundplay.Helper.MusicArt;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
+import com.abapp.soundplay.databinding.ItemViewRecyclerBinding;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>  implements FastScrollRecyclerView.SectionedAdapter{
 
     Context context;
     ArrayList<SongsInfo> mData;
@@ -27,21 +36,48 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     MusicArt musicArt;
 
+    RecyclerView recyclerView;
+
+    int lastPos = -1;
+
+
+    //main thread
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
 
     // data is passed into the constructor
-    public RecyclerViewAdapter(Context context, ArrayList<SongsInfo> data) {
-        this.mData = data;
+    public RecyclerViewAdapter(Context context) {
+        this.mData = new ArrayList<>();
+        this.context = context;
+
+        musicArt = MusicArt.getInstance();
+    }
+
+    // data is passed into the constructor
+    public RecyclerViewAdapter(RecyclerView r, Context context) {
+        this.recyclerView= r;
+        this.mData = new ArrayList<>();
         this.context = context;
 
         musicArt = MusicArt.getInstance();
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateList(ArrayList<SongsInfo> data){
+        this.mData = data;
+        notifyDataSetChanged();
+    }
+
+
+
     // inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_view_recycler, parent, false));
+        LayoutInflater inflater = LayoutInflater.from(context);
+        ItemViewRecyclerBinding binding = ItemViewRecyclerBinding.inflate(inflater, parent, false);
+        return new ViewHolder(binding);
     }
 
 
@@ -50,58 +86,117 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
+
         SongsInfo songsInfo = mData.get(position);
 
         String nameOfSOng = songsInfo.getTitle1();
 
         if (songsInfo.getPath().isDirectory()) {
-            holder.myTextView.setText(nameOfSOng);
-
-            holder.imageViewID.setImageResource(R.drawable.baseline_folder_24);
-
-            holder.layoutPlayerImage.setBackgroundResource(0);
-            holder.menuImage.setVisibility(View.GONE);
-            holder.playerArtist.setVisibility(View.GONE);
-            holder.playerSongLength.setVisibility(View.GONE);
+            holder.binding.playerTitle.setText(nameOfSOng);
+            holder.binding.playerImage.setImageResource(R.drawable.baseline_folder_24);
+            holder.binding.layoutPlayerImage.setBackgroundResource(0);
+            holder.binding.playerMenu.setVisibility(View.GONE);
+            holder.binding.playerTitleArtist.setVisibility(View.GONE);
+            holder.binding.lengthOfSong.setVisibility(View.GONE);
 
         } else {
-            holder.layoutPlayerImage.setBackgroundResource(R.color.colorSecondaryVar);
+            holder.binding.playerImage.setBackgroundResource(R.color.colorSecondaryVar);
             nameOfSOng = nameOfSOng.lastIndexOf(".") > 0 ? nameOfSOng.substring(0, nameOfSOng.lastIndexOf(".")) : nameOfSOng;
 
-            holder.myTextView.setText(nameOfSOng);
+            holder.binding.playerTitle.setText(nameOfSOng);
 
-            //            set song bitmap
-            Bitmap testBitmap = musicArt.getAlbumArt(songsInfo, holder.imageViewID);
-            if (testBitmap != null) {
-                holder.imageViewID.setImageBitmap(testBitmap);
-            }
+
+
+//            // Clear any previous Glide request
+            Glide.with(context).clear(holder.binding.playerImage);
+            holder.binding.playerImage.setImageResource(R.drawable.baseline_music_note_24);
+
+
+            //wait 300ms
+            new Handler().postDelayed(() -> {
+                //check item visible
+                if (isPositionVisible(position)) {
+                    //load in bg
+                    ExecutorService executorService = Executors.newFixedThreadPool(4);
+                    executorService.execute(() -> {
+
+                        //load image
+                        Glide.with(context)
+                                .load(musicArt.getAlbumArt(songsInfo))
+                                .into(new CustomTarget<Drawable>() {
+                                    @Override
+                                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+
+                                        //show in main thread
+                                        mainHandler.post(() -> {
+                                            //again check is visible
+                                            if (isPositionVisible(holder.getAdapterPosition())) {
+                                                holder.binding.playerImage.setImageDrawable(resource);
+                                                holder.binding.playerImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.scale));
+                                            }
+                                        });
+
+                                    }
+                                    @Override
+                                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    }
+                                });
+                    });
+
+                }
+
+            }, 300);
+
+
 
 
             //set artist
-            if (songsInfo.getArtist().isEmpty()) holder.playerArtist.setText("<unknown>");
-            else holder.playerArtist.setText(songsInfo.getArtist());
+            if (songsInfo.getArtist().isEmpty()) holder.binding.playerTitleArtist.setText("<unknown>");
+            else holder.binding.playerTitleArtist.setText(songsInfo.getArtist());
 
 
             //set duration
-            if (!songsInfo.getSongLength().isEmpty()) holder.playerSongLength.setText(songsInfo.getSongLength());
+            if (!songsInfo.getSongLength().isEmpty()) holder.binding.lengthOfSong.setText(songsInfo.getSongLength());
 
         }
 
 
-        holder.itemView.setOnClickListener(v -> {
+        holder.binding.getRoot().setOnClickListener(v -> {
             if (mClickListener != null) mClickListener.onItemClick(v, songsInfo, position, mData);
         });
 
-        holder.itemView.setOnLongClickListener(v -> {
+        holder.binding.getRoot().setOnLongClickListener(v -> {
             if (mClickListener != null) mClickListener.onItemLongClick(v, songsInfo, position, mData);
             return true;
         });
 
-        holder.menuImage.setOnClickListener(v -> {
+        holder.binding.playerMenu.setOnClickListener(v -> {
             if (mClickListener != null) mClickListener.onMenuClick(v, songsInfo, position, mData);
         });
 
     }
+
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Glide.with(context).clear(holder.binding.playerImage);
+    }
+
+    private boolean isPositionVisible(int position) {
+        if (recyclerView==null) return false;
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (layoutManager != null) {
+            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+            int lastVisiblePosition = layoutManager.findLastVisibleItemPosition();
+            return position >= firstVisiblePosition && position <= lastVisiblePosition;
+        }
+        return false;
+    }
+
+
+
 
     //get title first letter
     public String getTitle(int position) {
@@ -115,24 +210,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mData.size();
     }
 
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return mData.get(position).getTitle1().substring(0, 1).toUpperCase();
+    }
 
     // stores and recycles views as they are scrolled off screen
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout layoutPlayerImage;
-        TextView myTextView, playerSongLength, playerArtist;
-        ImageView imageViewID, menuImage;
+        private final ItemViewRecyclerBinding binding;
 
-        ViewHolder(View itemView) {
-            super(itemView);
-            layoutPlayerImage = itemView.findViewById(R.id.layoutPlayerImage);
-            myTextView = itemView.findViewById(R.id.playerTitle);
-            imageViewID = itemView.findViewById(R.id.playerImage);
-            menuImage = itemView.findViewById(R.id.playerMenu);
-            playerArtist = itemView.findViewById(R.id.playerTitleArtist);
-            playerSongLength = itemView.findViewById(R.id.lengthOfSong);
+        ViewHolder(ItemViewRecyclerBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
-
     }
+
+
 
     // convenience method for getting data at click position
     SongsInfo getItem(int id) {

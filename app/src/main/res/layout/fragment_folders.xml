@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="5dp"
+        android:background="@color/colorSecondary">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="@string/folder"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="15dp"/>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,39 +39,53 @@
         </LinearLayout>
 
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"/>
+
+
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
             android:id="@+id/recyclerViewFolders"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/backFolder"
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_margin="20dp"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="27dp"
-        app:cardBackgroundColor="@color/colorSecondary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="7dp"
-            android:contentDescription="@string/todo"
-            android:src="@drawable/icon_back_folder" />
+            app:fastScrollAutoHide="false"
+            app:fastScrollPopupBgColor="?attr/colorAccent"
+            app:fastScrollPopupTextColor="@color/textColor"
+            app:fastScrollThumbColor="?attr/colorAccent"
+            app:fastScrollThumbEnabled="true"
+            app:fastScrollThumbInactiveColor="?attr/colorAccent" />
 
-    </androidx.cardview.widget.CardView>
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/backFolder"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_margin="20dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="27dp"
+            android:layout_gravity="end|bottom"
+            app:cardBackgroundColor="@color/colorSecondary">
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="7dp"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/icon_back_folder" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
+
+</LinearLayout>

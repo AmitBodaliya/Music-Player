@@ -1,6 +1,9 @@
 package com.abapp.soundplay.Helper;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 
 import com.abapp.soundplay.Model.SongsInfo;
@@ -66,7 +69,27 @@ public class FetchFileData {
     }
 
 
-    private SongsInfo createSongInfo(File file) {
+    public SongsInfo createSongInfo(File file) {
+        return new SongsInfo(
+                file.getName().substring(0, file.getName().lastIndexOf(".")),
+                mediaMetaData.getSongArtist(file),
+                mediaMetaData.getSongAlbum(file),
+                mediaMetaData.getSongLength(file),
+                file
+        );
+    }
+
+    public SongsInfo createSongInfoFromUri(Uri uri) {
+        // Convert URI to file path
+        String filePath = getFilePathFromUri(uri);
+        if (filePath == null) {
+            return null;
+        }
+
+        // Create File object from file path
+        File file = new File(filePath);
+
+        // Create and return SongsInfo object
         return new SongsInfo(
                 file.getName().substring(0, file.getName().lastIndexOf(".")),
                 mediaMetaData.getSongArtist(file),
@@ -77,6 +100,31 @@ public class FetchFileData {
     }
 
 
+    private String getFilePathFromUri(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+
+        String scheme = uri.getScheme();
+        if ("content".equals(scheme)) {
+            return getFilePathFromContentUri(uri);
+        } else if ("file".equals(scheme)) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    private String getFilePathFromContentUri(Uri uri) {
+        String[] projection = { MediaStore.Audio.Media.DATA };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+            cursor.close();
+            return filePath;
+        }
+        return null;
+    }
 
 
 
