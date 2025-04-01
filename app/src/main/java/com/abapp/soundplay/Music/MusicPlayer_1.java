@@ -21,7 +21,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -98,29 +100,38 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
     }
 
     String playerT = "1";
-    private void mediaPlayerSwitch(SongsInfo songsInfo, int seekTo){
-        if(!isSongFilePresent("" + songsInfo.getPath())) return;
 
-        if(playerT.equals("1")){
-            mediaPlayer1 = MediaPlayer.create(getApplicationContext(), Uri.fromFile(songsInfo.getPath()));
-            mediaPlayer1.start();
-            mediaPlayer1.setVolume(1, 1);
-            mediaPlayer1.seekTo(seekTo);
-            mediaPlayer2.setVolume(0, 0);
-            mediaPlayer2.stop();
-            mediaPlayer2.release();
+
+    private void mediaPlayerSwitch(SongsInfo songsInfo, int seekTo) {
+        if (!isSongFilePresent("" + songsInfo.getPath())) return;
+
+        MediaPlayer newPlayer;
+        MediaPlayer oldPlayer;
+
+        if (playerT.equals("1")) {
+            if (mediaPlayer2 != null) oldPlayer = mediaPlayer2;
+            else oldPlayer = null;
+            newPlayer = mediaPlayer1 = MediaPlayer.create(getApplicationContext(), Uri.fromFile(songsInfo.getPath()));
             playerT = "2";
-        }else {
-            mediaPlayer2 = MediaPlayer.create(getApplicationContext(), Uri.fromFile(songsInfo.getPath()));
-            mediaPlayer2.start();
-            mediaPlayer2.setVolume(1, 1);
-            mediaPlayer2.seekTo(seekTo);
-            mediaPlayer1.setVolume(0, 0);
-            mediaPlayer1.stop();
-            mediaPlayer1.release();
+        } else {
+            if (mediaPlayer1 != null) oldPlayer = mediaPlayer1;
+            else oldPlayer = null;
+            newPlayer = mediaPlayer2 = MediaPlayer.create(getApplicationContext(), Uri.fromFile(songsInfo.getPath()));
             playerT = "1";
         }
+
+        // Ensure newPlayer is valid
+        if (newPlayer != null) {
+            newPlayer.setVolume(0, 0); // Start silent
+            newPlayer.seekTo(seekTo);
+            newPlayer.start();
+            fadeIn(newPlayer);
+        }
+
+        // Fade out and release old player (if it exists)
+        if (oldPlayer != null) fadeOutAndRelease(oldPlayer);
     }
+
 
 
     public boolean isSongFilePresent(String filePath) {
@@ -331,11 +342,9 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
 
 
         //notificationReceiver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            createChannel();
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"), Context.RECEIVER_NOT_EXPORTED);
-            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-        }
+        createChannel();
+        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"), Context.RECEIVER_NOT_EXPORTED);
+        startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
 
     }
 
@@ -680,8 +689,11 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setShowCancelButton(true)
                         .setShowActionsInCompactView(0, 1, 2)
-                        .setMediaSession(mediaSession.getSessionToken()))
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                        .setMediaSession(mediaSession.getSessionToken())
+                )
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                ;
+
 
 
         return builder.build();
@@ -714,5 +726,59 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
             throw new IllegalArgumentException("Unsupported drawable type");
         }
     }
+
+
+
+
+
+
+
+    //extra functions
+
+    // Function to fade in a MediaPlayer
+    private void fadeIn(MediaPlayer player) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final float volumeStep = 0.1f; // Adjust volume in 10% steps
+        final int delay = 50; // 100ms per step
+
+        handler.postDelayed(new Runnable() {
+            float volume = 0;
+
+            @Override
+            public void run() {
+                if (volume < 1.0f) {
+                    volume += volumeStep;
+                    player.setVolume(volume, volume);
+                    handler.postDelayed(this, delay);
+                }
+            }
+        }, delay);
+    }
+
+    // Function to fade out and release a MediaPlayer
+    private void fadeOutAndRelease(MediaPlayer player) {
+        if (player == null) return;
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final float volumeStep = 0.1f;
+        final int delay = 50;
+
+        handler.postDelayed(new Runnable() {
+            float volume = 1.0f;
+
+            @Override
+            public void run() {
+                if (volume > 0.0f) {
+                    volume -= volumeStep;
+                    player.setVolume(volume, volume);
+                    handler.postDelayed(this, delay);
+                } else {
+                    player.stop();
+                    player.release();
+                }
+            }
+        }, delay);
+    }
+
 
 }

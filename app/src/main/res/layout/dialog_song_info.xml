@@ -24,11 +24,12 @@
         android:padding="10dp"
         android:gravity="center">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardViewAlbumImage"
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_margin="10dp"
+            app:strokeWidth="0dp"
             android:backgroundTint="@color/colorSecondary"
             app:cardElevation="5dp"
             app:cardCornerRadius="15dp">
@@ -38,9 +39,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/todo"
+                android:scaleType="centerCrop"
                 app:srcCompat="@drawable/baseline_music_note_24" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

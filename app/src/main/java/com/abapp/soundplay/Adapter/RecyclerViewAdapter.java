@@ -38,7 +38,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     RecyclerView recyclerView;
 
-    int lastPos = -1;
 
 
     //main thread
@@ -100,7 +99,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             holder.binding.lengthOfSong.setVisibility(View.GONE);
 
         } else {
-            holder.binding.playerImage.setBackgroundResource(R.color.colorSecondaryVar);
             nameOfSOng = nameOfSOng.lastIndexOf(".") > 0 ? nameOfSOng.substring(0, nameOfSOng.lastIndexOf(".")) : nameOfSOng;
 
             holder.binding.playerTitle.setText(nameOfSOng);
@@ -119,6 +117,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     //load in bg
                     ExecutorService executorService = Executors.newFixedThreadPool(4);
                     executorService.execute(() -> {
+
+                        mainHandler.post(() -> holder.binding.playerImage.setImageResource(R.drawable.baseline_music_note_24));
 
                         //load image
                         Glide.with(context)
@@ -145,7 +145,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 }
 
-            }, 300);
+            }, 200);
 
 
 

@@ -3,22 +3,33 @@ package com.abapp.soundplay.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abapp.soundplay.Helper.MusicArt;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.Model.AlbumInfo;
 import com.abapp.soundplay.Model.SongsInfo;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHolder> {
 
@@ -28,10 +39,18 @@ public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHo
     private ItemClickListener mClickListener;
 
     MusicArt musicArt;
+    Context context;
+
+    RecyclerView recyclerView;
+
+    //main thread
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
 
     // data is passed into the constructor
-    public RVAAlbumArtists(Context context, ArrayList<AlbumInfo> data ) {
+    public RVAAlbumArtists(Context context, RecyclerView recyclerView, ArrayList<AlbumInfo> data ) {
+        this.context = context;
+        this.recyclerView = recyclerView;
         this.mInflater = LayoutInflater.from(context);
         this.albumInfoArrayList = data;
 
@@ -60,11 +79,73 @@ public class RVAAlbumArtists extends RecyclerView.Adapter<RVAAlbumArtists.ViewHo
         String artistName = albumInfo.getTitle();
         holder.titleName.setText((artistName.isEmpty() ? "<unknown>" : artistName)); //title
 
+
+
         //set song bitmap
-        Bitmap testBitmap = musicArt.getAlbumArt(albumInfo.getArrayList().get(0));
-        if (testBitmap != null) holder.titleImage.setImageBitmap(testBitmap);
+        Glide.with(context).clear(holder.titleImage);
+        holder.titleImage.setImageResource(R.drawable.baseline_music_note_24);
+
+
+        //wait 300ms
+        new Handler().postDelayed(() -> {
+            //check item visible
+            if (isPositionVisible(position)) {
+                //load in bg
+                ExecutorService executorService = Executors.newFixedThreadPool(4);
+                executorService.execute(() -> {
+
+                    mainHandler.post(() -> holder.titleImage.setImageResource(R.drawable.baseline_music_note_24));
+
+
+                    //load image
+                    Glide.with(context)
+                            .load(musicArt.getAlbumArt(albumInfo.getArrayList().get(0)))
+                            .into(new CustomTarget<Drawable>() {
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+
+                                    //show in main thread
+                                    mainHandler.post(() -> {
+                                        //again check is visible
+                                        if (isPositionVisible(holder.getAdapterPosition())) {
+                                            holder.titleImage.setImageDrawable(resource);
+                                            holder.titleImage.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_in));
+                                        }
+                                    });
+
+                                }
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                }
+                            });
+                });
+
+            }
+
+        }, 200);
+
     }
 
+
+    private boolean isPositionVisible(int position) {
+        if (recyclerView==null) return false;
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (layoutManager != null) {
+            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+            int lastVisiblePosition = layoutManager.findLastVisibleItemPosition();
+            return position >= firstVisiblePosition && position <= lastVisiblePosition;
+        }
+        return false;
+    }
+
+
+
+    @Override
+    public void onViewRecycled(@NonNull RVAAlbumArtists.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Glide.with(context).clear(holder.titleImage);
+    }
 
 
     // total number of rows

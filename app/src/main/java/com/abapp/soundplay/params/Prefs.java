@@ -17,6 +17,7 @@ public class Prefs {
 
     public static final String splashSongLoad = "splash_song_load";
     public static final String directSong = "direct_song";
+    public static final String reloadOnOpen = "reload_on_open";
 
 
 

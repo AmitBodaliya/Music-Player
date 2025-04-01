@@ -23,7 +23,7 @@
             android:id="@+id/layoutPlayerImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorSecondaryVar">
+            android:background="?attr/colorOnPrimary">
 
             <ImageView
                 android:id="@+id/playerImage"
@@ -31,6 +31,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
+                android:src="@drawable/baseline_music_note_24"
                 android:contentDescription="@string/todo" />
 
         </LinearLayout>
@@ -61,7 +62,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:visibility="visible"
-            android:textColor="@color/fadeTextColor"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="13sp" />
 
     </LinearLayout>

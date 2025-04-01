@@ -33,6 +33,10 @@ public class SongInfoView {
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     public void songInfoDialog(File uri) {
+        if (uri == null || !uri.exists() || !uri.isFile() || !uri.canRead()) {
+            Toast.makeText(context, "Invalid file! Please select a valid song.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context , R.style.BottomSheetDialogStyle );
         bottomSheetDialog.setContentView(R.layout.dialog_song_info);

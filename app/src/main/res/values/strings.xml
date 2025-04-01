@@ -29,7 +29,7 @@
     <string name="all_songs">All Songs</string>
     <string name="history">History</string>
     <string name="Recent">Recent</string>
-    <string name="reload_songs">Reload Songs</string>
+    <string name="reload_songs">Reload Music Library</string>
     <string name="no_data">No Data</string>
     <string name="album">Album</string>
     <string name="artist">Artist</string>
@@ -38,4 +38,10 @@
     <string name="refresh_list_in_splash">Refresh List in Splash</string>
     <string name="direct_play">Direct Play</string>
     <string name="no_result">No Result</string>
+    <string name="open_app_refresh_list">Scan for new songs on startup</string>
+    <string name="automatically_scan_internal_storage_for_new_music_when_the_app_starts">Automatically scan internal storage for new music when the app starts.</string>
+    <string name="view_details_before_playing">View details before playing</string>
+    <string name="tap_a_song_to_see_its_details_first_then_choose_to_play_from_the_last_position">Tap a song to see its details first, then choose to play from the last position.</string>
+    <string name="developer_amit_bodaliya">Developer: Amit Bodaliya</string>
+    <string name="visit_amitbodaliya_com">More info: amitbodaliya.com</string>
 </resources>

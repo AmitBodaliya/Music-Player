@@ -3,6 +3,8 @@ package com.abapp.soundplay.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,12 +77,12 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
 
 
             //set artist
-            if (songsInfo.getArtist().equals("")) holder.playerArtist.setText("<unknown>");
+            if (songsInfo.getArtist().isEmpty()) holder.playerArtist.setText("<unknown>");
             else holder.playerArtist.setText(songsInfo.getArtist());
 
 
             //set duration
-            if (!songsInfo.getSongLength().equals("")) holder.playerSongLength.setText(songsInfo.getSongLength());
+            if (!songsInfo.getSongLength().isEmpty()) holder.playerSongLength.setText(songsInfo.getSongLength());
 
         }
 
@@ -95,7 +97,10 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
 
         if (playingSong == position){
             holder.imageViewID.setImageResource(R.drawable.baseline_audio_wave);
-            holder.itemView.setBackgroundResource(R.color.fadeColorSecondary);
+
+            TypedValue typedValue = new TypedValue();
+            holder.itemView.getContext().getTheme().resolveAttribute(com.google.android.material.R.attr.colorSurfaceContainerHigh, typedValue, true);
+            holder.itemView.setBackgroundColor(typedValue.data);
         }else holder.itemView.setBackgroundResource(0);
 
     }
@@ -139,9 +144,12 @@ public class RVAUpNext extends RecyclerView.Adapter<RVAUpNext.ViewHolder> implem
         notifyItemMoved(fromPosition, toPosition);
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public void onRowSelected(RVAUpNext.ViewHolder myViewHolder) {
-        myViewHolder.itemView.setBackgroundResource(R.color.fadeColorSecondary);
+        TypedValue typedValue = new TypedValue();
+        myViewHolder.itemView.getContext().getTheme().resolveAttribute(com.google.android.material.R.attr.colorSurfaceContainerHigh, typedValue, true);
+        myViewHolder.itemView.setBackgroundColor(typedValue.data);
     }
 
     @Override

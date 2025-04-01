@@ -1,5 +1,7 @@
 package com.abapp.soundplay.Fragment;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.abapp.soundplay.params.Prefs;
 
 public class FragmentSettings extends Fragment {
 
+    LinearLayout openSite;
     LinearLayout reloadSongSetting;
 
 
@@ -37,39 +40,25 @@ public class FragmentSettings extends Fragment {
 
 
         //refresh list
+        openSite = v.findViewById(R.id.openSite);
         reloadSongSetting = v.findViewById(R.id.reloadSongSetting);
-        SwitchCompat switchListRefresh = v.findViewById(R.id.switchListRefresh);
-        switchListRefresh.setChecked(prefs.getPrefs(Prefs.splashSongLoad, false));
-        switchListRefresh.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.setPrefs(Prefs.splashSongLoad, isChecked));
+
+        //openSite
+        openSite.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.amitbodaliya.com"))));
 
         SwitchCompat switchDirectPlay = v.findViewById(R.id.switchDirectPlay);
         switchDirectPlay.setChecked(prefs.getPrefs(Prefs.directSong, false));
         switchDirectPlay.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.setPrefs(Prefs.directSong, isChecked));
+
+        SwitchCompat switchReloadOnOpen = v.findViewById(R.id.switchReloadOnOpen);
+        switchReloadOnOpen.setChecked(prefs.getPrefs(Prefs.reloadOnOpen, true));
+        switchReloadOnOpen.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.setPrefs(Prefs.reloadOnOpen, isChecked));
 
 
         reloadSongSetting.setOnClickListener(view -> {
             ((MainActivity) requireContext()).refreshList();
             Toast.makeText(requireContext(), "Refreshing...", Toast.LENGTH_SHORT).show();
         });
-
-
-
-        LinearLayout nestedScrollView = v.findViewById(R.id.subScrollView);
-
-        for (int i = 0; i < nestedScrollView.getChildCount(); i++) {
-            View childView = nestedScrollView.getChildAt(i);
-            if (childView instanceof CardView) {
-                CardView cardView = (CardView) childView;
-                final int position = i;
-                cardView.setOnClickListener(v1 -> {
-                    if(prefs.setPrefs(Prefs.customTheme, "" + position)){
-                        ((MainActivity) requireContext()).restartApp();
-                    }
-                });
-            }
-        }
-
-
 
 
         return v;

@@ -6,7 +6,7 @@ public class HardCoreData {
     public static final Boolean directDJ = true;
     public static final Boolean reloadSplash = false;
     public static final Boolean masterControl = true;
-    public static final String[] songExtensions = {".mp3" , ".WAV" , ".AAC" , ".WMA"};
+    public static final String[] songExtensions = {".mp3" , ".WAV" , ".AAC" , ".WMA", ".m4a"};
 
 //    public static final String[] songExtensions = {
 //            ".mp3", ".wav", ".aac", ".wma", ".opus", ".flac", ".alac", ".ogg", ".m4a", ".aiff",

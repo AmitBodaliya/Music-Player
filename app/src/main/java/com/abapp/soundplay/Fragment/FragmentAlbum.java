@@ -82,7 +82,7 @@ public class FragmentAlbum extends Fragment {
         albumList.sort(AlbumInfo.AppNameComparator);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new RVAAlbumArtists(context , albumList );
+        adapter = new RVAAlbumArtists(context, recyclerView, albumList );
         recyclerView.setLayoutManager(new GridLayoutManager(context, 3 ));
         recyclerView.setAdapter(adapter);
 

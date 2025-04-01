@@ -3,20 +3,32 @@ package com.abapp.soundplay.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abapp.soundplay.Helper.MusicArt;
+import com.abapp.soundplay.Model.AlbumInfo;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder> {
 
@@ -27,10 +39,16 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
     MusicArt musicArt;
 
 
+    RecyclerView recyclerView;
+
+    //main thread
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
     // data is passed into the constructor
-    public RAHHorizontal(Context context, ArrayList<SongsInfo> data) {
+    public RAHHorizontal(Context context, RecyclerView recyclerView, ArrayList<SongsInfo> data) {
         this.mData = data;
         this.context = context;
+        this.recyclerView = recyclerView;
 
         musicArt = MusicArt.getInstance();
     }
@@ -57,9 +75,49 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
         holder.myTextView.setText(nameOfSOng);
         holder.playerArtists.setText(songsInfo.getArtist());
 
+
 //            set song bitmap
-        Bitmap testBitmap = musicArt.getAlbumArt(songsInfo);
-        if (testBitmap != null) holder.imageViewID.setImageBitmap(testBitmap);
+
+        //set song bitmap
+        Glide.with(context).clear(holder.imageViewID);
+        holder.imageViewID.setImageResource(R.drawable.baseline_music_note_24);
+
+        //wait 300ms
+        new Handler().postDelayed(() -> {
+            //check item visible
+            if (isPositionVisible(position)) {
+                //load in bg
+                ExecutorService executorService = Executors.newFixedThreadPool(4);
+                executorService.execute(() -> {
+
+                    mainHandler.post(() -> holder.imageViewID.setImageResource(R.drawable.baseline_music_note_24));
+
+                    //load image
+                    Glide.with(context)
+                            .load(musicArt.getAlbumArt(songsInfo))
+                            .into(new CustomTarget<Drawable>() {
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+
+                                    //show in main thread
+                                    mainHandler.post(() -> {
+                                        //again check is visible
+                                        if (isPositionVisible(holder.getAdapterPosition())) {
+                                            holder.imageViewID.setImageDrawable(resource);
+                                            holder.imageViewID.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_in));
+                                        }
+                                    });
+
+                                }
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                }
+                            });
+                });
+
+            }
+
+        }, 200);
 
 
         holder.itemView.setOnClickListener(v -> {
@@ -76,6 +134,28 @@ public class RAHHorizontal extends RecyclerView.Adapter<RAHHorizontal.ViewHolder
         });
 
     }
+
+
+    @Override
+    public void onViewRecycled(@NonNull RAHHorizontal.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Glide.with(context).clear(holder.imageViewID);
+    }
+
+
+    private boolean isPositionVisible(int position) {
+        if (recyclerView==null) return false;
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (layoutManager != null) {
+            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+            int lastVisiblePosition = layoutManager.findLastVisibleItemPosition();
+            return position >= firstVisiblePosition && position <= lastVisiblePosition;
+        }
+        return false;
+    }
+
+
 
     //get title first letter
     public String getTitle(int position) {

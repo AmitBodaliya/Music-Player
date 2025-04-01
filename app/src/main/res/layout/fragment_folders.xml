@@ -9,8 +9,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="5dp"
-        android:background="@color/colorSecondary">
+        android:paddingHorizontal="5dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -61,7 +60,7 @@
             android:layout_height="match_parent"
             app:fastScrollAutoHide="false"
             app:fastScrollPopupBgColor="?attr/colorAccent"
-            app:fastScrollPopupTextColor="@color/textColor"
+            app:fastScrollPopupTextColor="@android:color/black"
             app:fastScrollThumbColor="?attr/colorAccent"
             app:fastScrollThumbEnabled="true"
             app:fastScrollThumbInactiveColor="?attr/colorAccent" />

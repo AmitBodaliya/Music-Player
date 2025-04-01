@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MediaMetaData {
 
@@ -50,17 +52,33 @@ public class MediaMetaData {
     }
 
 
-    //get album art of song
     public Bitmap getSongBitmap(File uri) {
-
         MediaMetadataRetriever mediaMetadata = new MediaMetadataRetriever();
-        mediaMetadata.setDataSource(String.valueOf(uri));
         try {
+            if (uri == null || !uri.exists() || !uri.isFile() || !uri.canRead()) {
+                Log.e("MediaMetaData", "Invalid file: " + (uri != null ? uri.getAbsolutePath() : "null"));
+                return null;
+            }
+
+            mediaMetadata.setDataSource(uri.getAbsolutePath());
             byte[] art = mediaMetadata.getEmbeddedPicture();
-            assert art != null;
-            return BitmapFactory.decodeByteArray(art, 0, art.length);
+
+            if (art != null && art.length > 0) {
+                return BitmapFactory.decodeByteArray(art, 0, art.length);
+            } else {
+                Log.w("MediaMetaData", "No album art found for: " + uri.getAbsolutePath());
+                return null; // Return null if no album art is found
+            }
+
         } catch (Exception e) {
+            Log.e("MediaMetaData", "Error retrieving album art", e);
             return null;
+        } finally {
+            try {
+                mediaMetadata.release(); // Release resources to avoid memory leaks
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

@@ -4,16 +4,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-
+    <!--    //new color-->
     <color name="colorPrimary">#19191B</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#2F3439</color>
+    <color name="colorOnPrimaryContainer">#BEBEBE</color>
+
     <color name="colorSecondary">#34313B</color>
-    <color name="fadeColorSecondary">#383B3E</color>
-    <color name="colorSecondaryVar">#2F3439</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
 
+    <color name="colorSurface">#121212</color>
+    <color name="colorOnSurface">#FFFFFF</color>
 
-    <color name="textColor">@color/white</color>
-    <color name="fadeTextColor">#BEBEBE</color>
-    <color name="tabSelectTextColor">#ffffff</color>
-    <color name="colorControlNormal">@color/white</color>
+    //check
+    <color name="colorSurfaceContainer">#121212</color>
+    <color name="colorSurfaceContainerLow">#121212</color>
+    <color name="colorSurfaceContainerHigh">#121212</color>
 
 </resources>

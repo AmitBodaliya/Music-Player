@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,6 +39,8 @@ public class FragmentMain extends Fragment {
     RecyclerView recyclerViewHistory;
     RAHHorizontal adapterAllHistory;
 
+    ProgressBar isUpdatingList;
+
     //live data
     LiveDataViewModel liveDataViewModel;
 
@@ -58,6 +61,7 @@ public class FragmentMain extends Fragment {
         historyLayout = v.findViewById(R.id.historyLayout);
         favLayout = v.findViewById(R.id.favLayout);
         allSongLayout = v.findViewById(R.id.allSongLayout);
+        isUpdatingList = v.findViewById(R.id.isUpdatingList);
 
         //set on click
         favIconLayout.setOnClickListener(v1 -> ((MainActivity) requireContext()).showAllFavSOng());
@@ -76,6 +80,11 @@ public class FragmentMain extends Fragment {
         liveDataViewModel.favSongLivaData.observe(getViewLifecycleOwner(), this::setRecyclerViewFav);
         liveDataViewModel.recentSongLivaData.observe(getViewLifecycleOwner(), this::setRecyclerViewHistory);
 
+        //list update observer
+        liveDataViewModel.updatingList.observe(getViewLifecycleOwner(), aBoolean -> {
+            isUpdatingList.setVisibility(aBoolean ? View.VISIBLE: View.GONE);
+        });
+
         return v;
     }
 
@@ -85,7 +94,7 @@ public class FragmentMain extends Fragment {
         //set recycler view;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewAllSongs.setLayoutManager(linearLayoutManager);
-        adapterAllSongs = new RAHHorizontal(requireContext() , arrayList);
+        adapterAllSongs = new RAHHorizontal(requireContext(), recyclerViewAllSongs, arrayList);
         recyclerViewAllSongs.setAdapter(adapterAllSongs);
 
         adapterAllSongs.setClickListener(new RAHHorizontal.ItemClickListener() {
@@ -114,7 +123,7 @@ public class FragmentMain extends Fragment {
         //set recycler view;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewFav.setLayoutManager(linearLayoutManager);
-        adapterAllFav = new RAHHorizontal(requireContext() , arrayList);
+        adapterAllFav = new RAHHorizontal(requireContext(), recyclerViewFav, arrayList);
         recyclerViewFav.setAdapter(adapterAllFav);
 
         adapterAllFav.setClickListener(new RAHHorizontal.ItemClickListener() {
@@ -144,7 +153,7 @@ public class FragmentMain extends Fragment {
         //set recycler view;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewHistory.setLayoutManager(linearLayoutManager);
-        adapterAllHistory = new RAHHorizontal(requireContext() , arrayList);
+        adapterAllHistory = new RAHHorizontal(requireContext(), recyclerViewHistory, arrayList);
         recyclerViewHistory.setAdapter(adapterAllHistory);
 
         adapterAllHistory.setClickListener(new RAHHorizontal.ItemClickListener() {

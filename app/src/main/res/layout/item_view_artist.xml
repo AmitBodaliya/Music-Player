@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -7,19 +7,21 @@
     app:cardCornerRadius="7dp"
     app:cardElevation="@dimen/cardElevation"
     android:layout_margin="5dp"
-    android:backgroundTint="@color/colorSecondary">
+    app:strokeWidth="0dp"
+    android:backgroundTint="?attr/colorSurfaceContainerHigh">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:cardCornerRadius="7dp"
             app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/fadeColorSecondary"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorOnPrimary"
             android:layout_gravity="center">
 
             <ImageView
@@ -32,7 +34,7 @@
                 android:src="@drawable/baseline_person_music"
                 android:contentDescription="@string/todo" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
 
         <LinearLayout
@@ -40,7 +42,7 @@
             android:layout_height="30dp"
             android:orientation="horizontal">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/artistName"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -65,4 +67,4 @@
     </LinearLayout>
 
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

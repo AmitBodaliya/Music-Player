@@ -6,13 +6,14 @@
     android:id="@+id/motionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:fitsSystemWindows="true"
     app:layoutDescription="@xml/motion_scene_up_next_list">
 
     <RelativeLayout
         android:id="@+id/music_controller_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorPrimary"
         android:orientation="vertical">
 
         <LinearLayout
@@ -59,7 +60,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/baseline_info_24" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardViewAlbumImage"
                     android:layout_width="280dp"
                     android:layout_height="280dp"
@@ -67,6 +68,7 @@
                     android:backgroundTint="@color/colorSecondary"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="10dp"
+                    app:strokeWidth="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -82,7 +84,7 @@
                         android:visibility="visible"
                         app:srcCompat="@drawable/baseline_music_note_24" />
 
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -108,7 +110,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.4">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/titleScreen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -121,7 +123,7 @@
                         android:textSize="28sp"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/titleArtistScreen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -131,7 +133,7 @@
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
                         android:singleLine="true"
-                        android:textColor="@color/fadeTextColor"
+                        android:textColor="?android:attr/textColorSecondary"
                         android:textSize="18sp" />
 
                 </LinearLayout>
@@ -166,7 +168,7 @@
                             android:gravity="center"
                             android:paddingHorizontal="15dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/timeCurrentScreen"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -180,7 +182,7 @@
                                 android:layout_weight="1"
                                 android:background="@null"/>
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/timeDuringScreen"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -208,10 +210,11 @@
                             android:layout_weight="1"
                             android:gravity="center">
 
-                            <androidx.cardview.widget.CardView
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:backgroundTint="@color/colorSecondary"
+                                app:strokeWidth="0dp"
+                                android:backgroundTint="?attr/colorOnPrimary"
                                 app:cardCornerRadius="50dp"
                                 app:cardElevation="2dp">
 
@@ -222,9 +225,10 @@
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/todo"
                                     android:padding="10dp"
-                                    app:srcCompat="@drawable/baseline_skip_previous_24" />
+                                    app:srcCompat="@drawable/baseline_skip_previous_24"
+                                    app:tint="?attr/colorPrimary" />
 
-                            </androidx.cardview.widget.CardView>
+                            </com.google.android.material.card.MaterialCardView>
 
 
                         </LinearLayout>
@@ -235,11 +239,12 @@
                             android:layout_weight="1"
                             android:gravity="center">
 
-                            <androidx.cardview.widget.CardView
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="70dp"
                                 android:layout_height="70dp"
-                                android:backgroundTint="?attr/colorAccent"
+                                android:backgroundTint="?attr/colorOnPrimary"
                                 app:cardCornerRadius="70dp"
+                                app:strokeWidth="0dp"
                                 app:cardElevation="2dp">
 
                                 <ImageView
@@ -250,9 +255,9 @@
                                     android:contentDescription="@string/todo"
                                     android:padding="14dp"
                                     app:srcCompat="@drawable/play_drawable"
-                                    app:tint="@color/white" />
+                                    app:tint="?attr/colorPrimary" />
 
-                            </androidx.cardview.widget.CardView>
+                            </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
 
@@ -262,10 +267,11 @@
                             android:layout_weight="1"
                             android:gravity="center">
 
-                            <androidx.cardview.widget.CardView
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                app:cardBackgroundColor="@color/colorSecondary"
+                                app:strokeWidth="0dp"
+                                app:cardBackgroundColor="?attr/colorOnPrimary"
                                 app:cardCornerRadius="50dp"
                                 app:cardElevation="2dp">
 
@@ -276,9 +282,10 @@
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/todo"
                                     android:padding="10dp"
-                                    app:srcCompat="@drawable/baseline_skip_next_24" />
+                                    app:srcCompat="@drawable/baseline_skip_next_24"
+                                    app:tint="?attr/colorPrimary" />
 
-                            </androidx.cardview.widget.CardView>
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -328,7 +335,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/titleUpNextList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -337,12 +344,12 @@
                     android:gravity="center_vertical"
                     android:textStyle="bold" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/subTitleUpNextList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
-                    android:textColor="@color/fadeTextColor"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:gravity="center_vertical"/>
 
             </LinearLayout>
@@ -362,14 +369,13 @@
         <View
             android:id="@+id/divider3"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider_color"/>
+            android:layout_height="0.7dp"
+            android:background="?attr/colorControlHighlight"/>
 
         <LinearLayout
-            android:background="?attr/colorPrimary"
+            android:background="?attr/colorSurface"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/upNextListRecyclerView"

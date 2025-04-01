@@ -1,7 +1,5 @@
 package com.abapp.soundplay.Activity;
 
-import static android.util.Log.getStackTraceString;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -18,6 +16,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -28,7 +27,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -40,15 +38,14 @@ import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
-import com.abapp.soundplay.MyApplication;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
 import com.abapp.soundplay.ViewHalper.ShowListView;
 import com.abapp.soundplay.ViewHalper.SongInfoView;
 import com.abapp.soundplay.ViewModel.LiveDataViewModel;
-import com.abapp.soundplay.params.HardCoreData;
+import com.abapp.soundplay.databinding.ActivityMainBinding;
+import com.abapp.soundplay.databinding.ContentDockMasterBinding;
 import com.abapp.soundplay.params.Prefs;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
@@ -57,19 +54,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    //music payer view
-    LinearLayout content_dock_master;
-    ImageView albumImagePlayer;
-    SeekBar seekBarPlayer;
-    TextView titleTextPlayer;
-    ImageView btnNextPlayer;
-    ImageView playPausePlayer;
-
-
-    //full screen view
-    BottomNavigationView bottomNavigationView;
     PlayerFullView playerFullView;
-
 
     //Media Data
     MediaMetaData mediaMetaData;
@@ -79,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     //array list
     SongsInfo currentSong;
+
     ArrayList<SongsInfo> upNextList = new ArrayList<>();
 
 
@@ -113,38 +99,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private ActivityMainBinding binding;
+    private ContentDockMasterBinding dockBinding;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(new MyApplication().applyCustomTheme(this));
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+
+
+        // Access views in the included layout
+        dockBinding = ContentDockMasterBinding.bind(binding.dockLayout.getRoot());
+
 
         setupCrashHandler();
-
-        //music payer view
-        content_dock_master = findViewById(R.id.content_dock_master);
-        albumImagePlayer = findViewById(R.id.albumImagePlayer);
-        seekBarPlayer = findViewById(R.id.seekBarPlayer);
-        titleTextPlayer = findViewById(R.id.titleTextPlayer);
-        btnNextPlayer = findViewById(R.id.btnNextPlayer);
-        playPausePlayer = findViewById(R.id.playPausePlayer);
-
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-
-        content_dock_master.setVisibility(View.GONE);
-        content_dock_master.setOnTouchListener(new OnSwipeGesture(this){
-            @Override
-            public void onClick() {
-                openPlayingSong();
-            }
-
-            @Override
-            public void onSwipeTop() {
-                openPlayingSong();
-            }
-        });
 
 
 
@@ -153,47 +125,73 @@ public class MainActivity extends AppCompatActivity {
         uniqueIdGen = UniqueIdGen.getInstance();
 
 
-
-
         // Create an instance of the ViewModel
         liveDataViewModel = new ViewModelProvider(this).get(LiveDataViewModel.class);
         liveDataViewModel.initData(this);
 
 
-
         //media
         mediaMetaData = new MediaMetaData(this);
+
         fetchFileData = new FetchFileData(this);
 
 
-        //set default navigation view
-        NavigationUI.setupWithNavController(bottomNavigationView, Navigation.findNavController(this, R.id.nav_host_fragment_activity_main));
-        setDefaultNav();
+        // init view
+        initView();
+
+        //refresh list of song if applied
+        if (prefs.getPrefs(Prefs.reloadOnOpen, true)) refreshList();
 
 
-        //update ui broadcast
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
+        new Handler().postDelayed(() -> {
+            if (musicBinder == null) return;
+            handleIncomingIntent(getIntent());
+        }, 2000);
+    }
 
 
-        String filePath = getIntent().getStringExtra("FILE_PATH");
-        if(filePath != null && !filePath.isEmpty()){
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIncomingIntent(intent);
+    }
+
+
+    public void handleIncomingIntent(Intent intent){
+        Uri audioUri = intent.getData();
+
+        if(audioUri != null){
             ArrayList<SongsInfo> newList = new ArrayList<>();
-            SongsInfo songsInfo = fetchFileData.createSongInfoFromUri(Uri.parse(filePath));
+            SongsInfo songsInfo = fetchFileData.createSongInfoFromUri(audioUri);
             newList.add(songsInfo);
-            onItemLongClick(null, songsInfo, 0, newList);
+            onItemClick(null, songsInfo, 0, newList);
         }
-
-
-        //refresh list of song
-        refreshList();
     }
 
 
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void initView(){
+
+        //set default navigation view
+        NavigationUI.setupWithNavController(binding.bottomNavigation, Navigation.findNavController(this, R.id.nav_host_fragment_activity_main));
+        setDefaultNav();
+
+
+        //update ui broadcast
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverUpdateUi, new IntentFilter(getPackageName() + ".PLAYBACK_STATE_CHANGED"));
+
+    }
+
+
+
+
     public void setDefaultNav(){
-        bottomNavigationView.setSelectedItemId(R.id.navigation_main);
+        binding.bottomNavigation.setSelectedItemId(R.id.navigation_main);
     }
 
 
@@ -560,8 +558,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        content_dock_master.setVisibility(View.VISIBLE);
-        content_dock_master.setOnTouchListener(new OnSwipeGesture(this) {
+        dockBinding.contentDockMaster.setVisibility(View.VISIBLE);
+        dockBinding.contentDockMaster.setOnTouchListener(new OnSwipeGesture(this) {
             @Override
             public void onClick() {
                 openPlayingSong();
@@ -576,35 +574,35 @@ public class MainActivity extends AppCompatActivity {
 
         //set album art
         Bitmap bitmap = mediaMetaData.getSongBitmap(songsInfo.getPath());
-        if (bitmap != null) albumImagePlayer.setImageBitmap(bitmap);
-        else albumImagePlayer.setImageResource(R.drawable.baseline_music_note_24);
+        if (bitmap != null) dockBinding.albumImagePlayer.setImageBitmap(bitmap);
+        else dockBinding.albumImagePlayer.setImageResource(R.drawable.baseline_music_note_24);
 
         //on play pause click
-        btnNextPlayer.setOnClickListener(v -> musicBinder.nextSong());
+        dockBinding.btnNextPlayer.setOnClickListener(v -> musicBinder.nextSong());
 
 
         //on play pause click
-        playPausePlayer.setOnClickListener(v -> {
+        dockBinding.playPausePlayer.setOnClickListener(v -> {
             if (musicBinder.isMusicPlaying()) {
                 musicBinder.pauseMusic();
-                playPausePlayer.setImageResource(R.drawable.play_drawable);
+                dockBinding.playPausePlayer.setImageResource(R.drawable.play_drawable);
             } else {
                 musicBinder.playMusic();
-                playPausePlayer.setImageResource(R.drawable.baseline_pause_24);
+                dockBinding.playPausePlayer.setImageResource(R.drawable.baseline_pause_24);
             }
         });
 
 
         //set title
-        titleTextPlayer.setText(songsInfo.getTitle1());
+        dockBinding.titleTextPlayer.setText(songsInfo.getTitle1());
 
         //set play pause
-        playPausePlayer.setImageResource((musicBinder.isMusicPlaying())? R.drawable.baseline_pause_24 : R.drawable.play_drawable);
+        dockBinding.playPausePlayer.setImageResource((musicBinder.isMusicPlaying())? R.drawable.baseline_pause_24 : R.drawable.play_drawable);
 
 
 //        set seek Bar
-        seekBarPlayer.setMax(musicBinder.getDuration());
-        seekBarPlayer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        dockBinding.seekBarPlayer.setMax(musicBinder.getDuration());
+        dockBinding.seekBarPlayer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
@@ -629,7 +627,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 int mCurrentPosition = musicBinder.getCurrentPosition();
-                seekBarPlayer.setProgress(mCurrentPosition);
+                dockBinding.seekBarPlayer.setProgress(mCurrentPosition);
                 mHandler.postDelayed(this, 1000);
             }
         };

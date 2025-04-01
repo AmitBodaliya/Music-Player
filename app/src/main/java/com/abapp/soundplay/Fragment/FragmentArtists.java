@@ -74,7 +74,7 @@ public class FragmentArtists extends Fragment {
         artistList.sort(AlbumInfo.AppNameComparator);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new RVAAlbumArtists(context , artistList );
+        adapter = new RVAAlbumArtists(context, recyclerView, artistList );
         recyclerView.setLayoutManager(new GridLayoutManager(context, 3 ));
         recyclerView.setAdapter(adapter);
 

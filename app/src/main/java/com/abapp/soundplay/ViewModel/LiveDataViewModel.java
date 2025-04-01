@@ -55,6 +55,7 @@ public class LiveDataViewModel extends ViewModel {
     public MutableLiveData<ArrayList<AlbumInfo>> artistLivaData;
     public MutableLiveData<ArrayList<AlbumInfo>> albumLivaData;
 
+    public MutableLiveData<Boolean> updatingList = new MutableLiveData<>(false);
 
 
 
@@ -171,8 +172,10 @@ public class LiveDataViewModel extends ViewModel {
         Executor executor = Executors.newSingleThreadExecutor();
 
         executor.execute(() -> {
+            updatingList.postValue(true);
             ArrayList<SongsInfo> arrayList =  new ArrayList<>(fetchFileData.fetchFile(Environment.getExternalStorageDirectory() , false , false , true));
             songsRepository.insertAll(arrayList);
+            updatingList.postValue(false);
         });
     }
 
