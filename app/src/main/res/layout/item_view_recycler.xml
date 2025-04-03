@@ -10,11 +10,12 @@
     android:orientation="horizontal"
     android:background="?attr/selectableItemBackground">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_weight="0"
         app:cardElevation="0dp"
+        app:strokeWidth="0dp"
         app:cardCornerRadius="7dp"
         app:cardBackgroundColor="@android:color/transparent"
         android:layout_gravity="center">
@@ -23,7 +24,7 @@
             android:id="@+id/layoutPlayerImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/colorOnPrimary">
+            android:background="?colorPrimaryContainer">
 
             <ImageView
                 android:id="@+id/playerImage"
@@ -37,7 +38,7 @@
         </LinearLayout>
 
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +49,7 @@
         android:paddingEnd="5dp"
         android:orientation="vertical">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/playerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +57,7 @@
             android:singleLine="true"
             android:textSize="16sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/playerTitleArtist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,7 +68,7 @@
 
     </LinearLayout>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lengthOfSong"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

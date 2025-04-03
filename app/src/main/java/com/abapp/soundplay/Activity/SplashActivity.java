@@ -7,15 +7,20 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.abapp.soundplay.MyApplication;
 import com.abapp.soundplay.R;
 
 
@@ -27,6 +32,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(new MyApplication().applyCustomTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
@@ -37,6 +43,52 @@ public class SplashActivity extends AppCompatActivity {
         //check permission and grant permission
         if(checkPermission()) postDelay();
         else requestPermission();
+
+//        generateAndCopyColorXML(this);
+    }
+
+
+    public static void generateAndCopyColorXML(Context context) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<resources>\n\n");
+
+        int[][] colorAttrs = {
+                {com.google.android.material.R.attr.colorPrimary, Integer.parseInt("colorPrimary")},
+                {com.google.android.material.R.attr.colorOnPrimary, Integer.parseInt("colorOnPrimary")},
+                {com.google.android.material.R.attr.colorPrimaryContainer, Integer.parseInt("colorPrimaryContainer")},
+                {com.google.android.material.R.attr.colorOnPrimaryContainer, Integer.parseInt("colorOnPrimaryContainer")},
+                {com.google.android.material.R.attr.colorSecondary, Integer.parseInt("colorSecondary")},
+                {com.google.android.material.R.attr.colorOnSecondary, Integer.parseInt("colorOnSecondary")},
+                {com.google.android.material.R.attr.colorSurface, Integer.parseInt("colorSurface")},
+                {com.google.android.material.R.attr.colorOnSurface, Integer.parseInt("colorOnSurface")},
+//                {com.google.android.material.R.attr.colorBackground, Integer.parseInt("colorBackground")},
+//                {com.google.android.material.R.attr.statusBarColor, Integer.parseInt("colorStatusBar")},
+//                {com.google.android.material.R.attr.navigationBarColor, Integer.parseInt("colorNavigationBar")},
+//                {com.google.android.material.R.attr.textColorPrimary, Integer.parseInt("textColorPrimary")},
+//                {com.google.android.material.R.attr.textColorSecondary, Integer.parseInt("textColorSecondary")}
+        };
+
+        for (int[] attr : colorAttrs) {
+            TypedValue typedValue = new TypedValue();
+            if (context.getTheme().resolveAttribute(attr[0], typedValue, true)) {
+                int color = typedValue.data;
+                String hexColor = String.format("#%08X", (color & 0xFFFFFFFF));
+                stringBuilder.append("    <color name=\"").append(attr[1]).append("\">")
+                        .append(hexColor).append("</color>\n");
+            }
+        }
+
+        stringBuilder.append("\n</resources>");
+
+        String colorXML = stringBuilder.toString();
+
+        // Copy to Clipboard
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("colors.xml", colorXML);
+        clipboard.setPrimaryClip(clip);
+
+        // Show a Toast Message
+        Toast.makeText(context, "Colors copied to clipboard!", Toast.LENGTH_SHORT).show();
     }
 
 

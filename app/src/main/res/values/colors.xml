@@ -2,26 +2,31 @@
 <resources>
 
     <color name="ic_launcher_background">#3AD75E</color>
-    <color name="black">#313131</color>
+    <color name="black">#1F1F1F</color>
     <color name="white">#FFFFFFFF</color>
 
 
-<!--    //new color-->
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorPrimaryContainer">#BB86FC</color>
-    <color name="colorOnPrimaryContainer">#3700B3</color>
+    <!-- Primary Colors -->
+    <color name="colorPrimary">#895200</color>
+    <color name="colorOnPrimary">#ffffff</color>
+    <color name="colorPrimaryContainer">#ffdcbc</color>
+    <color name="colorOnPrimaryContainer">#2b1700</color>
 
-    <color name="colorSecondary">#03DAC5</color>
-    <color name="colorOnSecondary">#000000</color>
+    <!-- Secondary Colors -->
+    <color name="colorSecondary">#725a40</color>
+    <color name="colorOnSecondary">#ffffff</color>
+    <color name="colorSecondaryContainer">#feddbc</color>
+    <color name="colorOnSecondaryContainer">#291806</color>
 
-    <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnSurface">#121212</color>
-
-    //check
-    <color name="colorSurfaceContainer">?attr/colorSurfaceContainer</color>
-    <color name="colorSurfaceContainerLow">?attr/colorSurfaceContainerLow</color>
-    <color name="colorSurfaceContainerHigh">?attr/colorSurfaceContainerHigh</color>
+    <!-- Surface & Background Colors -->
+    <color name="colorSurface">#f9f9f9</color>
+    <color name="colorOnSurface">#1b1b1b</color>
+    <color name="colorOnSurfaceVariant">#474747</color>
+    <color name="colorOutline">#777777</color>
+    <color name="colorOutlineVariant">#c6c6c6</color>
+    <color name="colorSurfaceContainer">#eeeeee</color>
+    <color name="colorSurfaceContainerLow">#f3f3f3</color>
+    <color name="colorSurfaceContainerHigh">#e8e8e8</color>
 
 
 </resources>

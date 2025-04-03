@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
     android:orientation="vertical">
 
     <LinearLayout
@@ -68,7 +67,7 @@
                         app:cardElevation="0dp"
                         android:layout_margin="4dp"
                         app:strokeWidth="0dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+                        app:cardBackgroundColor="?colorSurfaceContainerHigh">
 
                         <LinearLayout
                             android:id="@+id/historyIconLayout"
@@ -108,7 +107,7 @@
                         app:cardElevation="0dp"
                         android:layout_margin="4dp"
                         app:strokeWidth="0dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+                        app:cardBackgroundColor="?colorSurfaceContainerHigh">
 
                         <LinearLayout
                             android:id="@+id/favIconLayout"
@@ -152,7 +151,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/Recent"
-                        android:textColor="?attr/colorAccent"
+                        android:textColor="?android:colorAccent"
                         android:paddingTop="15dp"
                         android:paddingHorizontal="15dp"
                         android:paddingBottom="4dp"
@@ -188,7 +187,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/favorites"
-                        android:textColor="?attr/colorAccent"
+                        android:textColor="?android:colorAccent"
                         android:paddingTop="15dp"
                         android:paddingHorizontal="15dp"
                         android:paddingBottom="4dp"
@@ -225,7 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/all_songs"
-                        android:textColor="?attr/colorAccent"
+                        android:textColor="?android:colorAccent"
                         android:paddingTop="15dp"
                         android:paddingHorizontal="15dp"
                         android:paddingBottom="4dp"

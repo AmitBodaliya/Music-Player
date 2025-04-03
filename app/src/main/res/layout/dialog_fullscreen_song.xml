@@ -6,7 +6,7 @@
     android:id="@+id/motionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
+    android:background="?colorSurface"
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/motion_scene_up_next_list">
 
@@ -65,7 +65,7 @@
                     android:layout_width="280dp"
                     android:layout_height="280dp"
                     android:layout_margin="10dp"
-                    android:backgroundTint="@color/colorSecondary"
+                    android:backgroundTint="?colorSecondary"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="10dp"
                     app:strokeWidth="0dp"
@@ -133,7 +133,7 @@
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
                         android:singleLine="true"
-                        android:textColor="?android:attr/textColorSecondary"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="18sp" />
 
                 </LinearLayout>
@@ -214,7 +214,7 @@
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 app:strokeWidth="0dp"
-                                android:backgroundTint="?attr/colorOnPrimary"
+                                android:backgroundTint="?colorPrimaryContainer"
                                 app:cardCornerRadius="50dp"
                                 app:cardElevation="2dp">
 
@@ -226,7 +226,7 @@
                                     android:contentDescription="@string/todo"
                                     android:padding="10dp"
                                     app:srcCompat="@drawable/baseline_skip_previous_24"
-                                    app:tint="?attr/colorPrimary" />
+                                    app:tint="?colorOnPrimaryContainer" />
 
                             </com.google.android.material.card.MaterialCardView>
 
@@ -242,7 +242,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="70dp"
                                 android:layout_height="70dp"
-                                android:backgroundTint="?attr/colorOnPrimary"
+                                android:backgroundTint="?colorPrimaryContainer"
                                 app:cardCornerRadius="70dp"
                                 app:strokeWidth="0dp"
                                 app:cardElevation="2dp">
@@ -255,7 +255,7 @@
                                     android:contentDescription="@string/todo"
                                     android:padding="14dp"
                                     app:srcCompat="@drawable/play_drawable"
-                                    app:tint="?attr/colorPrimary" />
+                                    app:tint="?colorOnPrimaryContainer" />
 
                             </com.google.android.material.card.MaterialCardView>
 
@@ -271,7 +271,7 @@
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 app:strokeWidth="0dp"
-                                app:cardBackgroundColor="?attr/colorOnPrimary"
+                                app:cardBackgroundColor="?colorPrimaryContainer"
                                 app:cardCornerRadius="50dp"
                                 app:cardElevation="2dp">
 
@@ -283,7 +283,7 @@
                                     android:contentDescription="@string/todo"
                                     android:padding="10dp"
                                     app:srcCompat="@drawable/baseline_skip_next_24"
-                                    app:tint="?attr/colorPrimary" />
+                                    app:tint="?colorOnPrimaryContainer" />
 
                             </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
@@ -370,10 +370,10 @@
             android:id="@+id/divider3"
             android:layout_width="match_parent"
             android:layout_height="0.7dp"
-            android:background="?attr/colorControlHighlight"/>
+            android:background="?colorControlHighlight"/>
 
         <LinearLayout
-            android:background="?attr/colorSurface"
+            android:background="?colorSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

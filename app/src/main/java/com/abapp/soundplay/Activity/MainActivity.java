@@ -16,7 +16,6 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,6 +37,7 @@ import com.abapp.soundplay.Helper.MediaMetaData;
 import com.abapp.soundplay.Helper.UniqueIdGen;
 import com.abapp.soundplay.Model.SongsInfo;
 import com.abapp.soundplay.Music.MusicPlayer_1;
+import com.abapp.soundplay.MyApplication;
 import com.abapp.soundplay.R;
 import com.abapp.soundplay.ViewHalper.PlayerFullView;
 import com.abapp.soundplay.ViewHalper.ShowListView;
@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(new MyApplication().applyCustomTheme());
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

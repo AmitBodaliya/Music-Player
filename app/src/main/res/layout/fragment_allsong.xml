@@ -16,10 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:fastScrollAutoHide="false"
-        app:fastScrollPopupBgColor="?attr/colorAccent"
-        app:fastScrollThumbColor="?attr/colorAccent"
-        app:fastScrollPopupTextColor="@android:color/black"
+        app:fastScrollPopupBgColor="?colorPrimary"
+        app:fastScrollThumbColor="?colorPrimary"
+        app:fastScrollPopupTextColor="?colorOnPrimary"
         app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="?attr/colorAccent" />
+        app:fastScrollThumbInactiveColor="?colorPrimary" />
 
 </FrameLayout>

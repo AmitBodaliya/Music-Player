@@ -8,7 +8,7 @@
     app:cardElevation="@dimen/cardElevation"
     android:layout_margin="5dp"
     app:strokeWidth="0dp"
-    android:backgroundTint="?attr/colorSurfaceContainerHigh">
+    android:backgroundTint="?colorSurfaceContainerHigh">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             app:cardCornerRadius="7dp"
             app:cardElevation="2dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
+            app:cardBackgroundColor="?colorPrimaryContainer"
             android:layout_gravity="center">
 
             <ImageView

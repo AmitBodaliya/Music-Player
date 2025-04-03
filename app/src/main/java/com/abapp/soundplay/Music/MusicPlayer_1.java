@@ -738,8 +738,8 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
     // Function to fade in a MediaPlayer
     private void fadeIn(MediaPlayer player) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        final float volumeStep = 0.1f; // Adjust volume in 10% steps
-        final int delay = 50; // 100ms per step
+        final float volumeStep = 0.2f; // Adjust volume in 10% steps
+        final int delay = 20; // 100ms per step
 
         handler.postDelayed(new Runnable() {
             float volume = 0;
@@ -760,8 +760,8 @@ public class MusicPlayer_1 extends Service implements MediaPlayer.OnPreparedList
         if (player == null) return;
 
         final Handler handler = new Handler(Looper.getMainLooper());
-        final float volumeStep = 0.1f;
-        final int delay = 50;
+        final float volumeStep = 0.2f;
+        final int delay = 20;
 
         handler.postDelayed(new Runnable() {
             float volume = 1.0f;
